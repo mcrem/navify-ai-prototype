@@ -270,7 +270,8 @@ function App() {
             </button>
             <button className="assistant-pill" aria-label="AI Companion">
               <span className="assistant-pill-glow" aria-hidden="true" />
-              <span className="assistant-pill-label">AI Companion</span>
+              <span className="assistant-pill-label assistant-pill-label-short">AI</span>
+              <span className="assistant-pill-label assistant-pill-label-long">Ready to assist</span>
             </button>
 
             <span className="vertical-divider" aria-hidden="true" />

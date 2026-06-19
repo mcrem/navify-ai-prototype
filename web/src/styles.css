@@ -130,34 +130,45 @@ button {
 
 .assistant-pill {
   position: relative;
+  width: 40px;
   height: 40px;
-  padding: 0 16px;
+  padding: 0 14px;
   margin-left: 8px;
-  border-radius: 999px;
+  border-radius: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  transition:
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 180ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease;
   background:
     linear-gradient(115deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.28)),
     linear-gradient(120deg, #7eeacb 0%, #8ac5ff 28%, #9c97ff 54%, #ffb2d4 78%, #8fe8d4 100%);
   background-size: 100% 100%, 220% 220%;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    0 1px 3px rgba(0, 0, 0, 0.18),
-    0 0 0 1px rgba(150, 167, 214, 0.24);
-  animation: assistantGradientShift 9s linear infinite;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  animation:
+    assistantGradientShift 9s linear infinite,
+    assistantBreath 3.4s ease-in-out infinite;
+  white-space: nowrap;
 }
 
 .assistant-pill-glow {
   position: absolute;
-  inset: 0;
+  inset: -10px;
   background:
-    radial-gradient(circle at 18% 50%, rgba(255, 255, 255, 0.55), transparent 22%),
-    radial-gradient(circle at 82% 48%, rgba(255, 255, 255, 0.28), transparent 24%);
+    radial-gradient(circle at 18% 50%, rgba(126, 234, 203, 0.18), transparent 30%),
+    radial-gradient(circle at 52% 50%, rgba(138, 197, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 82% 48%, rgba(255, 178, 212, 0.14), transparent 30%);
   pointer-events: none;
+  opacity: 0;
+  filter: blur(10px);
+  transition: opacity 240ms ease, transform 320ms ease;
+  transform: scale(0.92);
 }
 
 .assistant-pill-label {
@@ -169,6 +180,20 @@ button {
   line-height: 20px;
   letter-spacing: 0;
   white-space: nowrap;
+  transition:
+    opacity 220ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.assistant-pill-label-short {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.assistant-pill-label-long {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .icon-svg {
@@ -238,14 +263,28 @@ button {
 }
 
 .assistant-pill:hover {
+  width: 142px;
+  border-radius: 14px;
   background:
     linear-gradient(115deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.34)),
     linear-gradient(120deg, #84eed3 0%, #93ceff 28%, #a69cff 54%, #ffbddb 78%, #9ef0df 100%);
   background-size: 100% 100%, 220% 220%;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    0 3px 8px rgba(60, 94, 170, 0.2),
-    0 0 0 1px rgba(150, 167, 214, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.assistant-pill:hover .assistant-pill-glow {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.assistant-pill:hover .assistant-pill-label-short {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.assistant-pill:hover .assistant-pill-label-long {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .icon-button:focus-visible,
@@ -265,6 +304,18 @@ button {
   }
   100% {
     background-position: 0 0, 0% 50%;
+  }
+}
+
+@keyframes assistantBreath {
+  0% {
+    filter: saturate(0.98) brightness(1);
+  }
+  50% {
+    filter: saturate(1.06) brightness(1.02);
+  }
+  100% {
+    filter: saturate(0.98) brightness(1);
   }
 }
 
