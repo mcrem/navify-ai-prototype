@@ -1,3 +1,6 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+
 function NavifyLogo() {
   return (
     <svg
@@ -83,7 +86,167 @@ function TaskIcon() {
   );
 }
 
+const NAV_ITEMS = [
+  { id: "home", label: "Home", title: "Welcome", Icon: HomeIcon },
+  { id: "overview", label: "Overview", title: "Overview", Icon: MonitorIcon },
+  { id: "analysis", label: "Analysis", title: "Analysis", Icon: HistogramIcon },
+  { id: "reports", label: "Reports", title: "Reports", Icon: TaskIcon },
+];
+
+const LAYOUT_LIBRARY = [
+  [
+    { columns: 3, heights: [160, 160, 160] },
+    { columns: 2, heights: [420, 420] },
+    { columns: 1, heights: [420] },
+  ],
+  [
+    { columns: 3, heights: [160, 160, 160] },
+    { columns: 1, heights: [420] },
+    { columns: 3, heights: [260, 260, 260] },
+    { columns: 1, heights: [360] },
+  ],
+  [
+    { columns: 3, heights: [160, 160, 160] },
+    { columns: 2, heights: [320, 320] },
+    { columns: 3, heights: [240, 240, 240] },
+    { columns: 1, heights: [420] },
+  ],
+  [
+    { columns: 3, heights: [160, 160, 160] },
+    { columns: 2, heights: [420, 420] },
+    { columns: 2, heights: [300, 300] },
+    { columns: 1, heights: [360] },
+  ],
+];
+
+function generateLayout(sectionId) {
+  const base = sectionId.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const randomOffset = Math.floor(Math.random() * LAYOUT_LIBRARY.length);
+  return LAYOUT_LIBRARY[(base + randomOffset) % LAYOUT_LIBRARY.length];
+}
+
+function Sidebar({ activeSection, onSelect }) {
+  return (
+    <aside className="sidebar" aria-label="Primary navigation">
+      {NAV_ITEMS.map(({ id, label, Icon }) => {
+        const selected = activeSection === id;
+
+        return (
+          <button
+            key={id}
+            className={`sidebar-item${selected ? " selected" : ""}`}
+            aria-current={selected ? "page" : undefined}
+            onClick={() => onSelect(id)}
+          >
+            {selected ? <span className="sidebar-selection-bar" aria-hidden="true" /> : null}
+            <span className="sidebar-icon-wrap">
+              <Icon />
+            </span>
+            <span className="sidebar-label">{label}</span>
+          </button>
+        );
+      })}
+    </aside>
+  );
+}
+
+function ContentSkeleton({ title, layout, sceneKey }) {
+  return (
+    <motion.div
+      key={sceneKey}
+      className="content-scene"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+    >
+      <motion.div
+        className="content-title-shell"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <h1 className="content-title">{title}</h1>
+      </motion.div>
+
+      <section className="content-main-skeleton">
+        {layout.map((row, rowIndex) => (
+          <div key={`${sceneKey}-${rowIndex}`} className={`skeleton-row columns-${row.columns}`}>
+            {row.heights.map((height, itemIndex) => (
+              <motion.div
+                key={`${sceneKey}-${rowIndex}-${itemIndex}`}
+                className="skeleton-card"
+                style={{ minHeight: `${height}px` }}
+                initial={{ opacity: 0, y: 28, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.995 }}
+                transition={{
+                  delay:
+                    0.2 +
+                    (layout
+                      .slice(0, rowIndex)
+                      .reduce((sum, currentRow) => sum + currentRow.heights.length, 0) +
+                      itemIndex) *
+                      0.12,
+                  duration: 0.58,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <div className="skeleton-card-inner">
+                  <div
+                    className="skeleton-card-title-placeholder"
+                    style={{
+                      width: `${44 + ((rowIndex * 19 + itemIndex * 13) % 28)}%`,
+                    }}
+                  />
+                  {height >= 220 ? (
+                    <div
+                      className="skeleton-card-copy-placeholder"
+                      style={{
+                        width: `${28 + ((rowIndex * 11 + itemIndex * 17) % 18)}%`,
+                      }}
+                    />
+                  ) : null}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ))}
+      </section>
+    </motion.div>
+  );
+}
+
 function App() {
+  const [activeSection, setActiveSection] = useState("home");
+  const [scene, setScene] = useState({
+    key: 1,
+    title: "Welcome",
+    layout: generateLayout("home"),
+  });
+  useEffect(() => {
+    document.title = "navify® Analytics";
+  }, []);
+
+  function handleSectionSelect(sectionId) {
+    if (sectionId === activeSection) {
+      return;
+    }
+
+    const nextItem = NAV_ITEMS.find((item) => item.id === sectionId);
+    if (!nextItem) {
+      return;
+    }
+
+    setActiveSection(sectionId);
+    setScene({
+      key: Date.now(),
+      title: nextItem.title,
+      layout: generateLayout(sectionId),
+    });
+  }
+
   return (
     <div className="page">
       <header className="topbar" aria-label="navify header">
@@ -113,7 +276,7 @@ function App() {
             <span className="vertical-divider" aria-hidden="true" />
 
             <button className="profile-chip" aria-label="User profile">
-              SR
+              MC
             </button>
 
             <button className="roche-badge" aria-label="Roche">
@@ -121,43 +284,22 @@ function App() {
             </button>
           </div>
         </div>
-
-        <div className="topbar-shadow" />
       </header>
 
       <div className="layout-shell">
-        <aside className="sidebar" aria-label="Primary navigation">
-          <button className="sidebar-item selected" aria-current="page">
-            <span className="sidebar-selection-bar" aria-hidden="true" />
-            <span className="sidebar-icon-wrap">
-              <HomeIcon />
-            </span>
-            <span className="sidebar-label">Home</span>
-          </button>
+        <Sidebar activeSection={activeSection} onSelect={handleSectionSelect} />
 
-          <button className="sidebar-item">
-            <span className="sidebar-icon-wrap">
-              <MonitorIcon />
-            </span>
-            <span className="sidebar-label">Overview</span>
-          </button>
-
-          <button className="sidebar-item">
-            <span className="sidebar-icon-wrap">
-              <HistogramIcon />
-            </span>
-            <span className="sidebar-label">Analysis</span>
-          </button>
-
-          <button className="sidebar-item">
-            <span className="sidebar-icon-wrap">
-              <TaskIcon />
-            </span>
-            <span className="sidebar-label">Reports</span>
-          </button>
-        </aside>
-
-        <main className="content-placeholder" />
+        <main className="content-placeholder">
+          <div className="content-scroll-region">
+            <AnimatePresence mode="wait">
+              <ContentSkeleton
+                title={scene.title}
+                layout={scene.layout}
+                sceneKey={scene.key}
+              />
+            </AnimatePresence>
+          </div>
+        </main>
       </div>
     </div>
   );
