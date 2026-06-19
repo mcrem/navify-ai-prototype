@@ -1,0 +1,265 @@
+:root {
+  --bg: #ffffff;
+  --text: #121212;
+  --muted: #121212;
+  --line: #d8d2c9;
+  --shadow: #3f3f3f;
+  --green: #79e22d;
+  --blue: #0d4bdb;
+  --font-body: "Roche Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@font-face {
+  font-family: "Roche Sans";
+  src: url("/fonts/RocheSans-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Roche Sans";
+  src: url("/fonts/RocheSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Roche Sans";
+  src: url("/fonts/RocheSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.page {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  font-family: var(--font-body);
+}
+
+button {
+  font: inherit;
+}
+
+.topbar {
+  position: relative;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.topbar-accent {
+  height: 4px;
+  background: var(--green);
+}
+
+.topbar-inner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navify-svg {
+  width: 76px;
+  height: 24px;
+  display: block;
+}
+
+.brand-title {
+  color: #121212;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 32px;
+  letter-spacing: 0;
+}
+
+.actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.icon-button,
+.assistant-pill,
+.profile-chip,
+.roche-badge {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.actions-group > .icon-button:first-child {
+  margin-left: 24px;
+}
+
+.actions-group > .icon-button + .icon-button {
+  margin-left: 8px;
+}
+
+.assistant-pill {
+  position: relative;
+  height: 40px;
+  padding: 0 16px;
+  margin-left: 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.28)),
+    linear-gradient(120deg, #7eeacb 0%, #8ac5ff 28%, #9c97ff 54%, #ffb2d4 78%, #8fe8d4 100%);
+  background-size: 100% 100%, 220% 220%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(150, 167, 214, 0.24);
+  animation: assistantGradientShift 9s linear infinite;
+}
+
+.assistant-pill-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 50%, rgba(255, 255, 255, 0.55), transparent 22%),
+    radial-gradient(circle at 82% 48%, rgba(255, 255, 255, 0.28), transparent 24%);
+  pointer-events: none;
+}
+
+.assistant-pill-label {
+  position: relative;
+  z-index: 1;
+  color: #11213e;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.icon-svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.icon-help {
+  width: 23px;
+  height: 23px;
+  border: 2px solid #1a1a1a;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #111;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 40px;
+  background: #c2bab5;
+  margin-left: 24px;
+}
+
+.profile-chip {
+  width: 41px;
+  height: 41px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #d8d1c8;
+  color: #121212;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0;
+  cursor: pointer;
+  margin-left: 24px;
+  transition: background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.roche-badge {
+  width: 62px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  margin-left: 24px;
+  border-radius: 4px;
+  transition: background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.roche-svg {
+  width: 62px;
+  height: 32px;
+  display: block;
+}
+
+.icon-button:hover,
+.assistant-pill:hover,
+.profile-chip:hover {
+  background: rgba(18, 18, 18, 0.05);
+}
+
+.assistant-pill:hover {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.34)),
+    linear-gradient(120deg, #84eed3 0%, #93ceff 28%, #a69cff 54%, #ffbddb 78%, #9ef0df 100%);
+  background-size: 100% 100%, 220% 220%;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 3px 8px rgba(60, 94, 170, 0.2),
+    0 0 0 1px rgba(150, 167, 214, 0.28);
+}
+
+.icon-button:focus-visible,
+.assistant-pill:focus-visible,
+.profile-chip:focus-visible,
+.roche-badge:focus-visible {
+  outline: 2px solid rgba(13, 75, 219, 0.38);
+  outline-offset: 2px;
+}
+
+@keyframes assistantGradientShift {
+  0% {
+    background-position: 0 0, 0% 50%;
+  }
+  50% {
+    background-position: 0 0, 100% 50%;
+  }
+  100% {
+    background-position: 0 0, 0% 50%;
+  }
+}
+
+.topbar-shadow {
+  display: none;
+}
