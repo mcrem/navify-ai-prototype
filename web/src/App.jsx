@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { NavifyLogo, AppLauncherIcon, NotificationIcon, RocheLogo } from "./icons";
 import { Sidebar, NAV_ITEMS } from "./Sidebar";
 import { ContentSkeleton, generateLayout } from "./ContentSkeleton";
+import { ArcPanel } from "./ArcPanel";
 
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
+  const [arcOpen, setArcOpen] = useState(false);
   const [scene, setScene] = useState({
     key: 1,
     title: "Welcome",
@@ -55,7 +57,12 @@ function App() {
             <button className="icon-button" aria-label="Help">
               <span className="icon-help">?</span>
             </button>
-            <button className="assistant-pill" aria-label="AI Companion">
+            <button
+              className="assistant-pill"
+              aria-label="AI Companion"
+              aria-expanded={arcOpen}
+              onClick={() => setArcOpen((prev) => !prev)}
+            >
               <span className="assistant-pill-glow" aria-hidden="true" />
               <span className="assistant-pill-label assistant-pill-label-short">AI</span>
               <span className="assistant-pill-label assistant-pill-label-long">Ready to assist</span>
@@ -89,6 +96,8 @@ function App() {
           </div>
         </main>
       </div>
+
+      <ArcPanel isOpen={arcOpen} onClose={() => setArcOpen(false)} />
     </div>
   );
 }
