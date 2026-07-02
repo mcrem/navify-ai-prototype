@@ -195,10 +195,19 @@ button {
   transition: opacity 520ms ease;
 }
 
+.assistant-pill-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
 .assistant-pill-label {
   position: absolute;
   left: 11px;
-  z-index: 2;
   color: #ffffff;
   font-size: 16px;
   font-weight: 500;
@@ -206,13 +215,12 @@ button {
   letter-spacing: 0;
   opacity: 0;
   transform: translateX(8px);
-  transition: opacity 120ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 380ms ease, transform 460ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .assistant-pill-icon-anchor {
   position: absolute;
   right: 11px;
-  z-index: 2;
   width: 18px;
   height: 18px;
   display: grid;
@@ -296,8 +304,7 @@ button {
 
 .assistant-pill.is-expanded .assistant-pill-glow-svg,
 .assistant-pill:hover .assistant-pill-glow-svg,
-.assistant-pill:focus-visible .assistant-pill-glow-svg,
-.assistant-pill.is-open .assistant-pill-glow-svg {
+.assistant-pill:focus-visible .assistant-pill-glow-svg {
   filter: blur(3px) saturate(1.04);
   transform: scale(1.02);
   animation: assistantGlowBreath 4s ease-in-out infinite;
@@ -305,16 +312,14 @@ button {
 
 .assistant-pill.is-expanded .assistant-pill-glow-active,
 .assistant-pill:hover .assistant-pill-glow-active,
-.assistant-pill:focus-visible .assistant-pill-glow-active,
-.assistant-pill.is-open .assistant-pill-glow-active {
+.assistant-pill:focus-visible .assistant-pill-glow-active {
   opacity: 0.76;
   animation: assistantActiveBreath 4s ease-in-out infinite;
 }
 
 .assistant-pill.is-expanded .assistant-pill-surface-active,
 .assistant-pill:hover .assistant-pill-surface-active,
-.assistant-pill:focus-visible .assistant-pill-surface-active,
-.assistant-pill.is-open .assistant-pill-surface-active {
+.assistant-pill:focus-visible .assistant-pill-surface-active {
   opacity: 0.64;
   animation: assistantActiveBreath 4s ease-in-out infinite;
   animation-delay: -1s;
@@ -322,17 +327,14 @@ button {
 
 .assistant-pill.is-expanded .assistant-pill-label,
 .assistant-pill:hover .assistant-pill-label,
-.assistant-pill:focus-visible .assistant-pill-label,
-.assistant-pill.is-open .assistant-pill-label {
+.assistant-pill:focus-visible .assistant-pill-label {
   opacity: 1;
   transform: translateX(0);
-  transition-delay: 70ms;
 }
 
 .assistant-pill.is-expanded .assistant-pill-icon-anchor,
 .assistant-pill:hover .assistant-pill-icon-anchor,
-.assistant-pill:focus-visible .assistant-pill-icon-anchor,
-.assistant-pill.is-open .assistant-pill-icon-anchor {
+.assistant-pill:focus-visible .assistant-pill-icon-anchor {
   transform: rotate(90deg);
 }
 

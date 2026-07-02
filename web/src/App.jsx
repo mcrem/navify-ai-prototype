@@ -1,5 +1,5 @@
 import { AnimatePresence, animate, motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { NavifyLogo, AppLauncherIcon, NotificationIcon, RocheLogo, AiCompanionIcon } from "./icons";
 import { Sidebar, NAV_ITEMS } from "./Sidebar";
 import { ContentSkeleton, generateLayout } from "./ContentSkeleton";
@@ -12,6 +12,19 @@ const ASSISTANT_HEIGHT = 40;
 
 function AiCompanionButton({ isOpen, onToggle }) {
   const [hovered, setHovered] = useState(false);
+  const hoverTimer = useRef(null);
+
+  const handleMouseEnter = useCallback(() => {
+    hoverTimer.current = setTimeout(() => setHovered(true), 120);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    clearTimeout(hoverTimer.current);
+    setHovered(false);
+  }, []);
+
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+
   const gradientId = useId().replaceAll(":", "");
   const glowGradientId = `${gradientId}-glow`;
   const activeGradientId = `${gradientId}-active`;
@@ -36,10 +49,10 @@ function AiCompanionButton({ isOpen, onToggle }) {
       aria-label="AI Companion"
       aria-expanded={isOpen}
       onClick={onToggle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onFocus={handleMouseEnter}
+      onBlur={handleMouseLeave}
       style={{ width }}
     >
       <motion.svg
@@ -88,9 +101,11 @@ function AiCompanionButton({ isOpen, onToggle }) {
         <motion.path className="assistant-pill-surface-active" d={shapePath} fill={`url(#${activeGradientId})`} />
       </motion.svg>
 
-      <span className="assistant-pill-label">AI Companion</span>
-      <span className="assistant-pill-icon-anchor" aria-hidden="true">
-        <AiCompanionIcon className="assistant-pill-icon" />
+      <span className="assistant-pill-content" aria-hidden="true">
+        <span className="assistant-pill-label">AI Companion</span>
+        <span className="assistant-pill-icon-anchor">
+          <AiCompanionIcon className="assistant-pill-icon" />
+        </span>
       </span>
     </motion.button>
   );
