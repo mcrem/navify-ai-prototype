@@ -3,14 +3,14 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { NavifyLogo, AppLauncherIcon, NotificationIcon, RocheLogo, AiCompanionIcon } from "./icons";
 import { Sidebar, NAV_ITEMS } from "./Sidebar";
 import { ContentSkeleton, generateLayout } from "./ContentSkeleton";
-import { ArcPanel } from "./ArcPanel";
+import { CompanionPanel } from "./CompanionPanel";
 import { createScalableSquirclePath } from "./squircle";
 
-const ASSISTANT_COLLAPSED_WIDTH = 40;
-const ASSISTANT_EXPANDED_WIDTH = 148;
-const ASSISTANT_HEIGHT = 40;
+const BUTTON_COLLAPSED_WIDTH = 40;
+const BUTTON_EXPANDED_WIDTH = 148;
+const BUTTON_HEIGHT = 40;
 
-function AiCompanionButton({ isOpen, onToggle }) {
+function AiCompanionButton({ onClick }) {
   const [hovered, setHovered] = useState(false);
   const hoverTimer = useRef(null);
 
@@ -29,26 +29,24 @@ function AiCompanionButton({ isOpen, onToggle }) {
   const glowGradientId = `${gradientId}-glow`;
   const activeGradientId = `${gradientId}-active`;
   const activeGlowGradientId = `${gradientId}-active-glow`;
-  const expanded = hovered || isOpen;
-  const width = useMotionValue(expanded ? ASSISTANT_EXPANDED_WIDTH : ASSISTANT_COLLAPSED_WIDTH);
-  const shapePath = useTransform(width, (value) => createScalableSquirclePath(value, ASSISTANT_HEIGHT));
-  const viewBox = useTransform(width, (value) => `0 0 ${value} ${ASSISTANT_HEIGHT}`);
+  const width = useMotionValue(hovered ? BUTTON_EXPANDED_WIDTH : BUTTON_COLLAPSED_WIDTH);
+  const shapePath = useTransform(width, (value) => createScalableSquirclePath(value, BUTTON_HEIGHT));
+  const viewBox = useTransform(width, (value) => `0 0 ${value} ${BUTTON_HEIGHT}`);
 
   useEffect(() => {
-    const controls = animate(width, expanded ? ASSISTANT_EXPANDED_WIDTH : ASSISTANT_COLLAPSED_WIDTH, {
+    const controls = animate(width, hovered ? BUTTON_EXPANDED_WIDTH : BUTTON_COLLAPSED_WIDTH, {
       duration: 0.46,
       ease: [0.22, 1, 0.36, 1],
     });
 
     return () => controls.stop();
-  }, [expanded, width]);
+  }, [hovered, width]);
 
   return (
     <motion.button
-      className={`assistant-pill${expanded ? " is-expanded" : ""}${isOpen ? " is-open" : ""}`}
+      className={`ai-button${hovered ? " is-expanded" : ""}`}
       aria-label="AI Companion"
-      aria-expanded={isOpen}
-      onClick={onToggle}
+      onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleMouseEnter}
@@ -56,7 +54,7 @@ function AiCompanionButton({ isOpen, onToggle }) {
       style={{ width }}
     >
       <motion.svg
-        className="assistant-pill-glow-svg"
+        className="ai-button-glow-svg"
         viewBox={viewBox}
         preserveAspectRatio="none"
         style={{ width }}
@@ -74,12 +72,12 @@ function AiCompanionButton({ isOpen, onToggle }) {
             <stop offset="100%" stopColor="#79E22D" stopOpacity="0.34" />
           </linearGradient>
         </defs>
-        <motion.path className="assistant-pill-glow-static" d={shapePath} fill={`url(#${glowGradientId})`} />
-        <motion.path className="assistant-pill-glow-active" d={shapePath} fill={`url(#${activeGlowGradientId})`} />
+        <motion.path className="ai-button-glow-static" d={shapePath} fill={`url(#${glowGradientId})`} />
+        <motion.path className="ai-button-glow-active" d={shapePath} fill={`url(#${activeGlowGradientId})`} />
       </motion.svg>
 
       <motion.svg
-        className="assistant-pill-shape-svg"
+        className="ai-button-shape-svg"
         viewBox={viewBox}
         preserveAspectRatio="none"
         style={{ width }}
@@ -98,13 +96,13 @@ function AiCompanionButton({ isOpen, onToggle }) {
           </linearGradient>
         </defs>
         <motion.path d={shapePath} fill={`url(#${gradientId})`} />
-        <motion.path className="assistant-pill-surface-active" d={shapePath} fill={`url(#${activeGradientId})`} />
+        <motion.path className="ai-button-surface-active" d={shapePath} fill={`url(#${activeGradientId})`} />
       </motion.svg>
 
-      <span className="assistant-pill-content" aria-hidden="true">
-        <span className="assistant-pill-label">AI Companion</span>
-        <span className="assistant-pill-icon-anchor">
-          <AiCompanionIcon className="assistant-pill-icon" />
+      <span className="ai-button-content" aria-hidden="true">
+        <span className="ai-button-label">AI Companion</span>
+        <span className="ai-button-icon-anchor">
+          <AiCompanionIcon className="ai-button-icon" />
         </span>
       </span>
     </motion.button>
@@ -113,7 +111,7 @@ function AiCompanionButton({ isOpen, onToggle }) {
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
-  const [arcOpen, setArcOpen] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
   const [scene, setScene] = useState({
     key: 1,
     title: "Welcome",
@@ -162,7 +160,7 @@ function App() {
             <button className="icon-button" aria-label="Help">
               <span className="icon-help">?</span>
             </button>
-            <AiCompanionButton isOpen={arcOpen} onToggle={() => setArcOpen((prev) => !prev)} />
+            <AiCompanionButton onClick={() => setPanelOpen((prev) => !prev)} />
 
             <span className="vertical-divider" aria-hidden="true" />
 
@@ -193,7 +191,7 @@ function App() {
         </main>
       </div>
 
-      <ArcPanel isOpen={arcOpen} onClose={() => setArcOpen(false)} />
+      <CompanionPanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   );
 }

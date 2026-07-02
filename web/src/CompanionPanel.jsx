@@ -3,14 +3,13 @@ import { useEffect, useId, useState } from "react";
 import { createScalableSquirclePath } from "./squircle";
 
 const SUGGESTIONS = [
-  "Summarize today's results",
-  "Flag anomalies in recent runs",
-  "Compare performance to last week",
-  "Draft an executive update",
+  "What is navify Analytics?",
+  "Why is my reagent consumption so high?",
+  "What does TAT achievement rate is about?",
 ];
 
 const SPRING = { type: "spring", stiffness: 180, damping: 22, mass: 1 };
-const PANEL_CORNER_SIZE = 56;
+const CORNER_SIZE = 160;
 
 function CloseIcon() {
   return (
@@ -28,13 +27,12 @@ function SendIcon() {
   );
 }
 
-export function ArcPanel({ isOpen, onClose }) {
+export function CompanionPanel({ isOpen, onClose }) {
   const [panelEl, setPanelEl] = useState(null);
   const [squirclePath, setSquirclePath] = useState("");
   const [viewBox, setViewBox] = useState("0 0 100 100");
   const baseId = useId().replaceAll(":", "");
-  const clipId = `${baseId}-clip`;
-  const fillId = `${baseId}-fill`;
+  const glowGradientId = `${baseId}-glow`;
 
   useEffect(() => {
     if (!panelEl) return;
@@ -42,7 +40,7 @@ export function ArcPanel({ isOpen, onClose }) {
     const observer = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       if (width > 0 && height > 0) {
-        setSquirclePath(createScalableSquirclePath(width, height, PANEL_CORNER_SIZE));
+        setSquirclePath(createScalableSquirclePath(width, height, CORNER_SIZE));
         setViewBox(`0 0 ${width} ${height}`);
       }
     });
@@ -54,7 +52,7 @@ export function ArcPanel({ isOpen, onClose }) {
     <AnimatePresence>
       {isOpen && (
         <motion.aside
-          className="arc-panel"
+          className="companion-panel"
           ref={setPanelEl}
           initial={{ x: 420, scale: 0.94 }}
           animate={{ x: 0, scale: 1 }}
@@ -62,38 +60,40 @@ export function ArcPanel({ isOpen, onClose }) {
           transition={SPRING}
           aria-label="AI Companion"
         >
-          <div className="arc-panel-glow" />
-
           <svg
-            className="arc-panel-shape-svg"
+            className="companion-panel-glow"
             viewBox={viewBox}
             preserveAspectRatio="none"
             aria-hidden="true"
           >
             <defs>
-              <linearGradient id={fillId} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.86" />
-                <stop offset="100%" stopColor="#f8f9ff" stopOpacity="0.76" />
+              <linearGradient id={glowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#A855F7" stopOpacity="0.35" />
+                <stop offset="50%" stopColor="#1582F8" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#79E22D" stopOpacity="0.2" />
+                <animate attributeName="x1" values="0%;100%;100%;0%;0%" dur="8s" repeatCount="indefinite" />
+                <animate attributeName="y1" values="0%;0%;100%;100%;0%" dur="8s" repeatCount="indefinite" />
+                <animate attributeName="x2" values="100%;0%;0%;100%;100%" dur="8s" repeatCount="indefinite" />
+                <animate attributeName="y2" values="100%;100%;0%;0%;100%" dur="8s" repeatCount="indefinite" />
               </linearGradient>
-              <clipPath id={clipId}>
-                <path d={squirclePath} />
-              </clipPath>
             </defs>
-            <path d={squirclePath} fill={`url(#${fillId})`} />
+            <path d={squirclePath} fill={`url(#${glowGradientId})`} />
+          </svg>
+
+          <svg
+            className="companion-panel-shape"
+            viewBox={viewBox}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path d={squirclePath} fill="rgba(255,255,255,0.95)" />
             <path d={squirclePath} fill="none" stroke="rgba(255,255,255,0.52)" strokeWidth="1" />
           </svg>
 
-          <div
-            className="arc-panel-glass"
-            style={{ clipPath: `url(#${clipId})` }}
-          >
-            <div className="arc-panel-aura arc-panel-aura-one" />
-            <div className="arc-panel-aura arc-panel-aura-two" />
-            <div className="arc-panel-aura arc-panel-aura-three" />
-
-            <div className="arc-panel-header">
+          <div className="companion-panel-content">
+            <div className="companion-panel-header">
               <motion.span
-                className="arc-wordmark"
+                className="companion-panel-title"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...SPRING, delay: 0.1 }}
@@ -101,7 +101,7 @@ export function ArcPanel({ isOpen, onClose }) {
                 AI Companion
               </motion.span>
               <motion.button
-                className="arc-close"
+                className="companion-panel-close"
                 onClick={onClose}
                 aria-label="Close"
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -112,52 +112,50 @@ export function ArcPanel({ isOpen, onClose }) {
               </motion.button>
             </div>
 
-            <div className="arc-panel-body">
-              <motion.div
-                className="arc-greeting"
+            <div className="companion-panel-body">
+              <motion.h2
+                className="companion-panel-heading"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...SPRING, delay: 0.16 }}
               >
-                <h2 className="arc-title">How can I help?</h2>
-                <p className="arc-subtitle">Ask about workflows, trends, utilization, or what deserves attention next.</p>
-              </motion.div>
+                How can I help?
+              </motion.h2>
+            </div>
 
-              <div className="arc-suggestions">
+            <motion.div
+              className="companion-panel-footer"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...SPRING, delay: 0.36 }}
+            >
+              <div className="companion-panel-suggestions">
                 {SUGGESTIONS.map((text, i) => (
                   <motion.button
                     key={text}
-                    className="arc-chip"
-                    initial={{ opacity: 0, y: 16 }}
+                    className="companion-panel-suggestion"
+                    initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      ...SPRING,
-                      delay: 0.24 + i * 0.07,
-                    }}
+                    transition={{ ...SPRING, delay: 0.4 + i * 0.07 }}
                   >
                     {text}
                   </motion.button>
                 ))}
               </div>
-            </div>
-
-            <motion.div
-              className="arc-panel-footer"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING, delay: 0.46 }}
-            >
-              <div className="arc-input-wrap">
+              <div className="companion-panel-input-wrap">
                 <input
-                  className="arc-input"
+                  className="companion-panel-input"
                   type="text"
-                  placeholder="Ask AI Companion anything..."
+                  placeholder="Ask navify AI Companion"
                   aria-label="Ask AI Companion"
                 />
-                <button className="arc-send" aria-label="Send">
+                <button className="companion-panel-send" aria-label="Send">
                   <SendIcon />
                 </button>
               </div>
+              <p className="companion-panel-disclaimer">
+                AI is not always infallible. <a href="#">Learn more</a>
+              </p>
             </motion.div>
           </div>
         </motion.aside>
