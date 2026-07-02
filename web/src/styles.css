@@ -110,7 +110,6 @@ button {
 /* === Header Action Buttons === */
 
 .icon-button,
-.assistant-pill,
 .profile-chip,
 .roche-badge {
   border: 0;
@@ -140,71 +139,92 @@ button {
 
 .assistant-pill {
   position: relative;
-  width: 40px;
   height: 40px;
-  padding: 0 14px;
+  padding: 0;
   margin-left: 8px;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
   border-radius: 0;
-  clip-path: path("M20.00 40.00C23.34 40.01 26.64 39.98 29.45 39.45C32.26 38.93 34.58 37.92 36.25 36.25C37.92 34.58 38.93 32.26 39.45 29.45C39.98 26.64 40.01 23.34 40.00 20.00C40.01 16.66 39.98 13.36 39.45 10.55C38.93 7.74 37.92 5.42 36.25 3.75C34.58 2.08 32.26 1.07 29.45 0.55C26.64 0.03 23.34 -0.01 20.00 0.00C16.66 -0.01 13.36 0.03 10.55 0.55C7.74 1.07 5.42 2.08 3.75 3.75C2.08 5.42 1.07 7.74 0.55 10.55C0.02 13.36 -0.01 16.66 0.00 20.00C-0.01 23.34 0.02 26.64 0.55 29.45C1.07 32.26 2.08 34.58 3.75 36.25C5.42 37.92 7.74 38.93 10.55 39.45C13.36 39.98 16.66 40.01 20.00 40.00Z");
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
-  transition:
-    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    clip-path 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 180ms ease,
-    box-shadow 220ms ease,
-    filter 220ms ease;
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.28)),
-    linear-gradient(120deg, #7eeacb 0%, #8ac5ff 28%, #9c97ff 54%, #ffb2d4 78%, #8fe8d4 100%);
-  background-size: 100% 100%, 220% 220%;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  animation:
-    assistantGradientShift 9s linear infinite,
-    assistantBreath 3.4s ease-in-out infinite;
+  isolation: isolate;
+  transform: translateZ(0);
+  transition: transform 220ms ease, filter 220ms ease;
   white-space: nowrap;
 }
 
-.assistant-pill-glow {
+.assistant-pill-shape-svg,
+.assistant-pill-glow-svg {
   position: absolute;
-  inset: -10px;
-  background:
-    radial-gradient(circle at 18% 50%, rgba(126, 234, 203, 0.18), transparent 30%),
-    radial-gradient(circle at 52% 50%, rgba(138, 197, 255, 0.16), transparent 34%),
-    radial-gradient(circle at 82% 48%, rgba(255, 178, 212, 0.14), transparent 30%);
+  inset: 0;
+  height: 40px;
   pointer-events: none;
+}
+
+.assistant-pill-shape-svg {
+  z-index: 1;
+  overflow: visible;
+}
+
+.assistant-pill-glow-svg {
+  z-index: 0;
+  inset: -2px;
+  height: 44px;
+  opacity: 1;
+  filter: blur(3px) saturate(0.98);
+  transform: scale(1.01);
+  transition: opacity 420ms ease, filter 520ms ease, transform 520ms ease;
+}
+
+.assistant-pill-glow-static {
+  opacity: 0.45;
+}
+
+.assistant-pill-glow-active {
   opacity: 0;
-  filter: blur(10px);
-  transition: opacity 240ms ease, transform 320ms ease;
-  transform: scale(0.92);
+  transition: opacity 520ms ease;
+}
+
+.assistant-pill-surface-active {
+  opacity: 0;
+  transition: opacity 520ms ease;
 }
 
 .assistant-pill-label {
-  position: relative;
-  z-index: 1;
-  color: #11213e;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  letter-spacing: 0;
-  white-space: nowrap;
-  transition:
-    opacity 220ms ease,
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.assistant-pill-label-short {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.assistant-pill-label-long {
   position: absolute;
+  left: 11px;
+  z-index: 2;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0;
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateX(8px);
+  transition: opacity 120ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.assistant-pill-icon-anchor {
+  position: absolute;
+  right: 11px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+  transition: transform 460ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.assistant-pill-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 .icon-svg {
@@ -270,34 +290,50 @@ button {
 /* === Hover & Focus States === */
 
 .icon-button:hover,
-.assistant-pill:hover,
 .profile-chip:hover {
   background: rgba(18, 18, 18, 0.05);
 }
 
-.assistant-pill:hover {
-  width: 142px;
-  clip-path: path("M71.00 40.00C92.39 40.01 113.53 39.98 131.45 39.45C134.26 38.93 136.58 37.92 138.25 36.25C139.92 34.58 140.93 32.26 141.45 29.45C141.98 26.64 142.01 23.34 142.00 20.00C142.01 16.66 141.98 13.36 141.45 10.55C140.93 7.74 139.92 5.42 138.25 3.75C136.58 2.08 134.26 1.07 131.45 0.55C113.53 0.03 92.39 -0.01 71.00 0.00C49.61 -0.01 28.47 0.03 10.55 0.55C7.74 1.07 5.42 2.08 3.75 3.75C2.08 5.42 1.07 7.74 0.55 10.55C0.02 13.36 -0.01 16.66 0.00 20.00C-0.01 23.34 0.02 26.64 0.55 29.45C1.07 32.26 2.08 34.58 3.75 36.25C5.42 37.92 7.74 38.93 10.55 39.45C28.47 39.98 49.61 40.01 71.00 40.00Z");
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.34)),
-    linear-gradient(120deg, #84eed3 0%, #93ceff 28%, #a69cff 54%, #ffbddb 78%, #9ef0df 100%);
-  background-size: 100% 100%, 220% 220%;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+.assistant-pill.is-expanded .assistant-pill-glow-svg,
+.assistant-pill:hover .assistant-pill-glow-svg,
+.assistant-pill:focus-visible .assistant-pill-glow-svg,
+.assistant-pill.is-open .assistant-pill-glow-svg {
+  filter: blur(3px) saturate(1.04);
+  transform: scale(1.02);
+  animation: assistantGlowBreath 4s ease-in-out infinite;
 }
 
-.assistant-pill:hover .assistant-pill-glow {
+.assistant-pill.is-expanded .assistant-pill-glow-active,
+.assistant-pill:hover .assistant-pill-glow-active,
+.assistant-pill:focus-visible .assistant-pill-glow-active,
+.assistant-pill.is-open .assistant-pill-glow-active {
+  opacity: 0.76;
+  animation: assistantActiveBreath 4s ease-in-out infinite;
+}
+
+.assistant-pill.is-expanded .assistant-pill-surface-active,
+.assistant-pill:hover .assistant-pill-surface-active,
+.assistant-pill:focus-visible .assistant-pill-surface-active,
+.assistant-pill.is-open .assistant-pill-surface-active {
+  opacity: 0.64;
+  animation: assistantActiveBreath 4s ease-in-out infinite;
+  animation-delay: -1s;
+}
+
+.assistant-pill.is-expanded .assistant-pill-label,
+.assistant-pill:hover .assistant-pill-label,
+.assistant-pill:focus-visible .assistant-pill-label,
+.assistant-pill.is-open .assistant-pill-label {
   opacity: 1;
-  transform: scale(1);
+  transform: translateX(0);
+  transition-delay: 70ms;
 }
 
-.assistant-pill:hover .assistant-pill-label-short {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-
-.assistant-pill:hover .assistant-pill-label-long {
-  opacity: 1;
-  transform: translateY(0);
+.assistant-pill.is-expanded .assistant-pill-icon-anchor,
+.assistant-pill:hover .assistant-pill-icon-anchor,
+.assistant-pill:focus-visible .assistant-pill-icon-anchor,
+.assistant-pill.is-open .assistant-pill-icon-anchor {
+  transform: rotate(90deg);
 }
 
 .icon-button:focus-visible,
@@ -322,6 +358,30 @@ button {
   }
 }
 
+@keyframes assistantGradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes assistantGlowPulse {
+  0% {
+    filter: blur(8px) saturate(1);
+  }
+  50% {
+    filter: blur(11px) saturate(1.12);
+  }
+  100% {
+    filter: blur(8px) saturate(1);
+  }
+}
+
 @keyframes assistantBreath {
   0% {
     filter: saturate(0.98) brightness(1);
@@ -334,51 +394,73 @@ button {
   }
 }
 
+@keyframes assistantGlowBreath {
+  0%, 100% {
+    filter: blur(3px) saturate(1.04);
+    transform: scale(1.02);
+  }
+  50% {
+    filter: blur(4px) saturate(1.1);
+    transform: scale(1.035);
+  }
+}
+
+@keyframes assistantActiveBreath {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
 /* === Arc AI Panel === */
 
 .arc-panel {
   position: fixed;
-  top: 12px;
+  top: 80px;
   right: 12px;
   bottom: 12px;
   width: 388px;
   z-index: 20;
   transform-origin: top right;
+  filter:
+    drop-shadow(0 4px 16px rgba(88, 96, 122, 0.12))
+    drop-shadow(0 1px 4px rgba(88, 96, 122, 0.06));
 }
 
 .arc-panel-glow {
   position: absolute;
-  inset: -18px;
-  border-radius: 40px;
+  inset: -6px;
+  border-radius: 34px;
   background:
-    radial-gradient(circle at 18% 24%, rgba(126, 234, 203, 0.28), transparent 34%),
-    radial-gradient(circle at 78% 18%, rgba(138, 197, 255, 0.26), transparent 36%),
-    radial-gradient(circle at 72% 82%, rgba(156, 151, 255, 0.22), transparent 34%),
-    radial-gradient(circle at 26% 86%, rgba(255, 178, 212, 0.18), transparent 30%);
+    radial-gradient(circle at 18% 24%, rgba(126, 234, 203, 0.16), transparent 34%),
+    radial-gradient(circle at 78% 18%, rgba(138, 197, 255, 0.14), transparent 36%),
+    radial-gradient(circle at 72% 82%, rgba(156, 151, 255, 0.12), transparent 34%),
+    radial-gradient(circle at 26% 86%, rgba(255, 178, 212, 0.1), transparent 30%);
   animation: arcHaloDrift 18s ease-in-out infinite;
   pointer-events: none;
-  filter: blur(20px);
-  opacity: 0.9;
+  filter: blur(8px);
+  opacity: 0.7;
+}
+
+.arc-panel-shape-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .arc-panel-glass {
   position: relative;
   height: 100%;
-  border-radius: 28px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(250, 251, 255, 0.68)),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.28));
-  backdrop-filter: blur(34px) saturate(1.35);
-  -webkit-backdrop-filter: blur(34px) saturate(1.35);
-  border: 1px solid rgba(255, 255, 255, 0.58);
-  box-shadow:
-    0 24px 80px rgba(88, 96, 122, 0.18),
-    0 8px 24px rgba(88, 96, 122, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.32);
+  z-index: 2;
+  background: transparent;
 }
 
 @keyframes arcGlowShift {
