@@ -100,7 +100,9 @@ function AiCompanionButton({ onClick }) {
       </motion.svg>
 
       <span className="ai-button-content" aria-hidden="true">
-        <span className="ai-button-label">AI Companion</span>
+        <span className="ai-button-label-clip">
+          <span className="ai-button-label">AI Companion</span>
+        </span>
         <span className="ai-button-icon-anchor">
           <AiCompanionIcon className="ai-button-icon" />
         </span>
