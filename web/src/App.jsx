@@ -722,7 +722,7 @@ function App() {
   });
 
   useEffect(() => {
-    document.title = stage === 3 ? "navify® AI Companion" : "navify® Analytics";
+    document.title = "Navify® AI Companion";
   }, [stage]);
 
   useEffect(() => {
