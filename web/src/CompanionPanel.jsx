@@ -29,10 +29,45 @@ const AI_ICON_PATH_1 =
 const AI_ICON_PATH_2 =
   "M8.00015 17.996C8.00365 16.4793 7.98612 15.0856 7.77071 13.9275C7.55825 12.7855 7.16633 11.9543 6.60593 11.3939C6.04552 10.8335 5.2143 10.4416 4.07232 10.2291C2.9142 10.0137 1.5205 9.99619 0.003889 9.9997L-1.62125e-05 8.00014C1.48941 7.9967 3.06685 8.00882 4.43747 8.26375C5.82411 8.52167 7.08055 9.04105 8.01968 9.98017C8.95881 10.9193 9.47818 12.1757 9.73609 13.5624C9.99103 14.933 10.0031 16.5104 9.99971 17.9999L8.00015 17.996Z";
 
+function UserBubble({ children }) {
+  const [el, setEl] = useState(null);
+  const [path, setPath] = useState("");
+  const [vb, setVb] = useState("0 0 100 40");
+
+  useEffect(() => {
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const w = entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width;
+      const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
+      if (w > 0 && h > 0) {
+        setPath(createScalableSquirclePath(w, h, 40));
+        setVb(`0 0 ${w} ${h}`);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [el]);
+
+  return (
+    <div className="companion-bubble" ref={setEl}>
+      <svg
+        className="companion-bubble-shape"
+        viewBox={vb}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path d={path} fill="rgba(0, 0, 0, 0.04)" />
+        <path d={path} fill="none" stroke="rgba(0, 0, 0, 0.08)" strokeWidth="1" />
+      </svg>
+      <span className="companion-bubble-text">{children}</span>
+    </div>
+  );
+}
+
 function SendIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 9H15M15 9L10 4M15 9L10 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+      <path d="M19.8671 10.2L5.86707 3.19997C5.52121 3.03254 5.13444 2.96828 4.75302 3.01489C4.3716 3.0615 4.01168 3.21699 3.71632 3.46278C3.42095 3.70857 3.20264 4.03424 3.0875 4.40084C2.97236 4.76744 2.96527 5.15944 3.06707 5.52997L5.00607 12L3.07607 18.47C2.97427 18.8405 2.98136 19.2325 3.0965 19.5991C3.21164 19.9657 3.42995 20.2914 3.72532 20.5372C4.02068 20.7829 4.3806 20.9384 4.76202 20.985C5.14344 21.0317 5.53021 20.9674 5.87607 20.8L19.8761 13.8C20.2142 13.6362 20.4994 13.3805 20.6989 13.0621C20.8985 12.7438 21.0043 12.3757 21.0043 12C21.0043 11.6243 20.8985 11.2561 20.6989 10.9378C20.4994 10.6194 20.2142 10.3637 19.8761 10.2H19.8671ZM17.0071 11H6.79707L5.00707 4.99997L17.0071 11ZM5.00707 19L6.78707 13H17.0071L5.00707 19Z" fill="currentColor" />
     </svg>
   );
 }
@@ -74,6 +109,8 @@ function ThinkingIndicator() {
 function TypingMessage({ text, onComplete, scrollRef }) {
   const [displayed, setDisplayed] = useState("");
   const indexRef = useRef(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     indexRef.current = 0;
@@ -84,7 +121,7 @@ function TypingMessage({ text, onComplete, scrollRef }) {
       if (indexRef.current >= text.length) {
         setDisplayed(text);
         clearInterval(interval);
-        if (onComplete) onComplete();
+        if (onCompleteRef.current) onCompleteRef.current();
       } else {
         setDisplayed(text.slice(0, indexRef.current));
       }
@@ -94,7 +131,7 @@ function TypingMessage({ text, onComplete, scrollRef }) {
     }, TYPING_SPEED);
 
     return () => clearInterval(interval);
-  }, [text, onComplete, scrollRef]);
+  }, [text, scrollRef]);
 
   return <>{displayed}</>;
 }
@@ -321,7 +358,9 @@ export function CompanionPanel({ isOpen, onClose }) {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ ...SPRING, delay: i < 2 ? i * 0.1 : 0.05 }}
                     >
-                      {msg.sender === "ai" && !msg.typed ? (
+                      {msg.sender === "user" ? (
+                        <UserBubble>{msg.text}</UserBubble>
+                      ) : !msg.typed ? (
                         <TypingMessage
                           text={msg.text}
                           onComplete={() => handleTypingComplete(i)}
