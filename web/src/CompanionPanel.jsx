@@ -13,8 +13,8 @@ const CORNER_SIZE = 160;
 
 function CloseIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12.5 3.5L3.5 12.5M3.5 3.5L12.5 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+      <path fillRule="evenodd" clipRule="evenodd" d="M16.645 4.53001L15.4708 3.35501L9.99998 8.82501L4.50915 3.33334L3.33331 4.50834L8.82498 10L3.33331 15.4917L4.50915 16.6667L9.99998 11.175L15.4916 16.6667L16.6666 15.4917L11.1758 10L16.645 4.53001Z" fill="currentColor" />
     </svg>
   );
 }
@@ -31,6 +31,9 @@ export function CompanionPanel({ isOpen, onClose }) {
   const [panelEl, setPanelEl] = useState(null);
   const [squirclePath, setSquirclePath] = useState("");
   const [viewBox, setViewBox] = useState("0 0 100 100");
+  const [inputEl, setInputEl] = useState(null);
+  const [inputPath, setInputPath] = useState("");
+  const [inputViewBox, setInputViewBox] = useState("0 0 100 48");
   const baseId = useId().replaceAll(":", "");
   const glowGradientId = `${baseId}-glow`;
 
@@ -47,6 +50,20 @@ export function CompanionPanel({ isOpen, onClose }) {
     observer.observe(panelEl);
     return () => observer.disconnect();
   }, [panelEl]);
+
+  useEffect(() => {
+    if (!inputEl) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setInputPath(createScalableSquirclePath(width, height, 48));
+        setInputViewBox(`0 0 ${width} ${height}`);
+      }
+    });
+    observer.observe(inputEl);
+    return () => observer.disconnect();
+  }, [inputEl]);
 
   return (
     <AnimatePresence>
@@ -100,16 +117,23 @@ export function CompanionPanel({ isOpen, onClose }) {
               >
                 AI Companion
               </motion.span>
-              <motion.button
+              <motion.svg
                 className="companion-panel-close"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
                 onClick={onClose}
                 aria-label="Close"
+                role="button"
+                tabIndex={0}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ ...SPRING, delay: 0.18 }}
               >
-                <CloseIcon />
-              </motion.button>
+                <path fillRule="evenodd" clipRule="evenodd" d="M16.645 4.53001L15.4708 3.35501L9.99998 8.82501L4.50915 3.33334L3.33331 4.50834L8.82498 10L3.33331 15.4917L4.50915 16.6667L9.99998 11.175L15.4916 16.6667L16.6666 15.4917L11.1758 10L16.645 4.53001Z" fill="currentColor" />
+              </motion.svg>
             </div>
 
             <div className="companion-panel-body">
@@ -142,7 +166,16 @@ export function CompanionPanel({ isOpen, onClose }) {
                   </motion.button>
                 ))}
               </div>
-              <div className="companion-panel-input-wrap">
+              <div className="companion-panel-input-wrap" ref={setInputEl}>
+                <svg
+                  className="companion-panel-input-shape"
+                  viewBox={inputViewBox}
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path d={inputPath} fill="#ffffff" />
+                  <path d={inputPath} fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
+                </svg>
                 <input
                   className="companion-panel-input"
                   type="text"
