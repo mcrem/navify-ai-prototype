@@ -595,7 +595,7 @@ button {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   padding: 24px;
   margin-top: 8px;
   overflow-y: auto;
@@ -611,12 +611,13 @@ button {
 .companion-message {
   max-width: 85%;
   font-size: 15px;
-  line-height: 22px;
+  line-height: 24px;
   font-weight: 400;
 }
 
 .companion-message--ai {
   align-self: flex-start;
+  max-width: 100%;
   color: #121212;
 }
 
@@ -947,7 +948,7 @@ button {
   align-items: center;
   gap: 32px;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   padding: 0 24px;
 }
 
@@ -989,7 +990,7 @@ button {
   position: relative;
   z-index: 1;
   flex: 1;
-  height: 56px;
+  height: 64px;
   padding: 0 56px 0 24px;
   border: 0;
   background: transparent;
@@ -1043,7 +1044,7 @@ button {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   height: 100%;
   margin: 0 auto;
   padding: 0 24px;
@@ -1053,7 +1054,7 @@ button {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
   padding: 24px 0;
   overflow-y: auto;
   mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%);
@@ -1210,51 +1211,80 @@ button {
 .mobile-ai-button-icon {
   position: relative;
   z-index: 1;
-  width: 18px;
-  height: 18px;
+  width: 29px;
+  height: 29px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.mobile-ai-icon {
+  width: 29px;
+  height: 29px;
+  display: block;
 }
 
 /* === Mobile Panel === */
 
 .mobile-panel {
   position: absolute;
-  inset: 0;
+  top: 76px;
+  right: 24px;
+  bottom: 44px;
+  left: 24px;
   z-index: 8;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  transform-origin: bottom right;
+}
+
+.mobile-panel-glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(10px);
+  opacity: 1;
+}
+
+.mobile-panel-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.mobile-panel-content {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-radius: 50px;
+  z-index: 2;
+  border-radius: 40px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .mobile-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 56px 20px 0;
+  height: 20px;
+  margin: 24px 20px 0 16px;
   flex-shrink: 0;
 }
 
 .mobile-panel-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #544f4f;
 }
 
 .mobile-panel-close {
-  width: 20px;
-  height: 20px;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
   color: #544f4f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .mobile-panel-body {
@@ -1267,7 +1297,7 @@ button {
 
 .mobile-panel-heading {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 300;
   color: #000;
   text-align: center;
@@ -1277,33 +1307,22 @@ button {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   padding: 16px 16px 8px;
+  margin-top: 8px;
   overflow-y: auto;
   mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%);
 }
 
-.mobile-msg {
-  max-width: 85%;
-  font-size: 13px;
-  line-height: 18px;
-  font-weight: 400;
-}
-
-.mobile-msg--ai {
-  align-self: flex-start;
-  color: #121212;
-}
-
-.mobile-msg--user {
-  align-self: flex-end;
-  color: #121212;
+.mobile-panel-chat.is-scrolled {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 32px, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 32px, black calc(100% - 24px), transparent 100%);
 }
 
 .mobile-panel-footer {
   flex-shrink: 0;
-  padding: 0 16px 32px;
+  padding: 0 16px 24px;
 }
 
 .mobile-panel-suggestions {
@@ -1318,7 +1337,7 @@ button {
   border: 0;
   background: transparent;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 400;
   color: #0b41cb;
   text-align: left;
@@ -1329,11 +1348,9 @@ button {
 }
 
 .mobile-panel-input-wrap {
+  position: relative;
   display: flex;
   align-items: center;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
   height: 40px;
 }
 
@@ -1343,13 +1360,15 @@ button {
 }
 
 .mobile-panel-input {
+  position: relative;
+  z-index: 1;
   flex: 1;
   height: 100%;
-  padding: 0 8px 0 14px;
+  padding: 0 40px 0 14px;
   border: 0;
   background: transparent;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 15px;
   color: #121212;
   outline: none;
 }
@@ -1359,6 +1378,9 @@ button {
 }
 
 .mobile-panel-send {
+  position: absolute;
+  z-index: 1;
+  right: 4px;
   width: 32px;
   height: 32px;
   border: 0;
@@ -1372,4 +1394,16 @@ button {
 
 .mobile-panel-send:hover {
   color: #544f4f;
+}
+
+.mobile-panel-disclaimer {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: rgba(18, 18, 18, 0.4);
+  text-align: center;
+}
+
+.mobile-panel-disclaimer a {
+  color: #0d4bdb;
+  text-decoration: none;
 }

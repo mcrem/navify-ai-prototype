@@ -179,13 +179,24 @@ function MobileAiButton({ onClick }) {
         <path d={path} fill={`url(#${gradientId})`} />
       </svg>
       <span className="mobile-ai-button-icon">
-        <AiCompanionIcon className="ai-button-icon" />
+        <AiCompanionIcon className="mobile-ai-icon" />
       </span>
     </button>
   );
 }
 
+const MOBILE_CORNER_SIZE = 80;
+
 function MobilePanel({ isOpen, onClose }) {
+  const [panelEl, setPanelEl] = useState(null);
+  const [squirclePath, setSquirclePath] = useState("");
+  const [panelViewBox, setPanelViewBox] = useState("0 0 100 100");
+  const [inputEl, setInputEl] = useState(null);
+  const [inputPath, setInputPath] = useState("");
+  const [inputViewBox, setInputViewBox] = useState("0 0 100 40");
+  const baseId = useId().replaceAll(":", "");
+  const glowGradientId = `${baseId}-mobile-glow`;
+
   const [inputValue, setInputValue] = useState("");
   const [mode, setMode] = useState("welcome");
   const [messages, setMessages] = useState([]);
@@ -194,6 +205,7 @@ function MobilePanel({ isOpen, onClose }) {
   const thinkingTimer = useRef(null);
   const responseIndex = useRef(0);
   const chatAreaRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -203,6 +215,7 @@ function MobilePanel({ isOpen, onClose }) {
       setMessages([]);
       setIsThinking(false);
       setIsTyping(false);
+      setScrolled(false);
       responseIndex.current = 0;
     }
   }, [isOpen]);
@@ -212,6 +225,12 @@ function MobilePanel({ isOpen, onClose }) {
       chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
   }, [messages, isThinking, isTyping]);
+
+  const handleScroll = useCallback(() => {
+    if (chatAreaRef.current) {
+      setScrolled(chatAreaRef.current.scrollTop > 8);
+    }
+  }, []);
 
   const handleTypingComplete = useCallback((msgIndex) => {
     setMessages((prev) =>
@@ -249,6 +268,32 @@ function MobilePanel({ isOpen, onClose }) {
     return () => clearTimeout(thinkingTimer.current);
   }, []);
 
+  useEffect(() => {
+    if (!panelEl) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setSquirclePath(createScalableSquirclePath(width, height, MOBILE_CORNER_SIZE));
+        setPanelViewBox(`0 0 ${width} ${height}`);
+      }
+    });
+    observer.observe(panelEl);
+    return () => observer.disconnect();
+  }, [panelEl]);
+
+  useEffect(() => {
+    if (!inputEl) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setInputPath(createScalableSquirclePath(width, height, 40));
+        setInputViewBox(`0 0 ${width} ${height}`);
+      }
+    });
+    observer.observe(inputEl);
+    return () => observer.disconnect();
+  }, [inputEl]);
+
   const isBusy = isThinking || isTyping;
 
   if (!isOpen) return null;
@@ -256,79 +301,140 @@ function MobilePanel({ isOpen, onClose }) {
   return (
     <motion.div
       className="mobile-panel"
+      ref={setPanelEl}
       initial={{ y: "100%", opacity: 0.8 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: "100%", opacity: 0.8 }}
       transition={{ type: "spring", stiffness: 260, damping: 28 }}
     >
-      <div className="mobile-panel-header">
-        <span className="mobile-panel-title">AI Companion</span>
-        <button className="mobile-panel-close" onClick={onClose}>
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
-            <path fillRule="evenodd" clipRule="evenodd" d="M16.645 4.53001L15.4708 3.35501L9.99998 8.82501L4.50915 3.33334L3.33331 4.50834L8.82498 10L3.33331 15.4917L4.50915 16.6667L9.99998 11.175L15.4916 16.6667L16.6666 15.4917L11.1758 10L16.645 4.53001Z" fill="currentColor" />
-          </svg>
-        </button>
-      </div>
+      <svg
+        className="mobile-panel-glow"
+        viewBox={panelViewBox}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id={glowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
+            <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
+            <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
+            <animate attributeName="x1" values="0%;100%;100%;0%;0%" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="y1" values="0%;0%;100%;100%;0%" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="x2" values="100%;0%;0%;100%;100%" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="y2" values="100%;100%;0%;0%;100%" dur="8s" repeatCount="indefinite" />
+          </linearGradient>
+        </defs>
+        <path d={squirclePath} fill={`url(#${glowGradientId})`} />
+      </svg>
 
-      <AnimatePresence mode="wait">
-        {mode === "welcome" ? (
-          <motion.div key="welcome" className="mobile-panel-body" exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-            <h2 className="mobile-panel-heading">How can I help?</h2>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="chat"
-            className="mobile-panel-chat"
-            ref={chatAreaRef}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
+      <svg
+        className="mobile-panel-shape"
+        viewBox={panelViewBox}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path d={squirclePath} fill="rgba(255,255,255,0.95)" />
+        <path d={squirclePath} fill="none" stroke="rgba(255,255,255,0.52)" strokeWidth="1" />
+      </svg>
+
+      <div className="mobile-panel-content">
+        <div className="mobile-panel-header">
+          <span className="mobile-panel-title">AI Companion</span>
+          <svg
+            className="mobile-panel-close"
+            width="16"
+            height="16"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            onClick={onClose}
+            role="button"
+            tabIndex={0}
+            style={{ display: "block", cursor: "pointer" }}
           >
-            {messages.map((msg, i) => (
-              <div key={i} className={`mobile-msg mobile-msg--${msg.sender}`}>
-                {msg.sender === "user" ? (
-                  <UserBubble>{msg.text}</UserBubble>
-                ) : !msg.typed ? (
-                  <TypingMessage text={msg.text} onComplete={() => handleTypingComplete(i)} scrollRef={chatAreaRef} />
-                ) : (
-                  msg.text
-                )}
-              </div>
-            ))}
-            <AnimatePresence>
-              {isThinking && <ThinkingIndicator />}
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <path fillRule="evenodd" clipRule="evenodd" d="M16.645 4.53001L15.4708 3.35501L9.99998 8.82501L4.50915 3.33334L3.33331 4.50834L8.82498 10L3.33331 15.4917L4.50915 16.6667L9.99998 11.175L15.4916 16.6667L16.6666 15.4917L11.1758 10L16.645 4.53001Z" fill="#544f4f" />
+          </svg>
+        </div>
 
-      <div className="mobile-panel-footer">
-        <AnimatePresence>
-          {mode === "welcome" && (
-            <motion.div key="suggestions" className="mobile-panel-suggestions" exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              {MOBILE_SUGGESTIONS.map((text) => (
-                <button key={text} className="mobile-panel-suggestion" onClick={() => handleSend(text)}>
-                  {text}
-                </button>
+        <AnimatePresence mode="wait">
+          {mode === "welcome" ? (
+            <motion.div key="welcome" className="mobile-panel-body" exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+              <h2 className="mobile-panel-heading">How can I help?</h2>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="chat"
+              className={`mobile-panel-chat${scrolled ? " is-scrolled" : ""}`}
+              ref={chatAreaRef}
+              onScroll={handleScroll}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  className={`companion-message companion-message--${msg.sender}`}
+                  initial={{ opacity: 0, x: msg.sender === "ai" ? -12 : 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ ...SPRING, delay: i < 2 ? i * 0.1 : 0.05 }}
+                >
+                  {msg.sender === "user" ? (
+                    <UserBubble>{msg.text}</UserBubble>
+                  ) : !msg.typed ? (
+                    <TypingMessage text={msg.text} onComplete={() => handleTypingComplete(i)} scrollRef={chatAreaRef} />
+                  ) : (
+                    msg.text
+                  )}
+                </motion.div>
               ))}
+              <AnimatePresence>
+                {isThinking && <ThinkingIndicator />}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>
-        <div className={`mobile-panel-input-wrap${isBusy ? " is-disabled" : ""}`}>
-          <input
-            className="mobile-panel-input"
-            type="text"
-            placeholder="Ask AI Companion"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
-            disabled={isBusy}
-          />
-          <button className="mobile-panel-send" onClick={() => handleSend()} disabled={isBusy}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
-              <path d="M19.8671 10.2L5.86707 3.19997C5.52121 3.03254 5.13444 2.96828 4.75302 3.01489C4.3716 3.0615 4.01168 3.21699 3.71632 3.46278C3.42095 3.70857 3.20264 4.03424 3.0875 4.40084C2.97236 4.76744 2.96527 5.15944 3.06707 5.52997L5.00607 12L3.07607 18.47C2.97427 18.8405 2.98136 19.2325 3.0965 19.5991C3.21164 19.9657 3.42995 20.2914 3.72532 20.5372C4.02068 20.7829 4.3806 20.9384 4.76202 20.985C5.14344 21.0317 5.53021 20.9674 5.87607 20.8L19.8761 13.8C20.2142 13.6362 20.4994 13.3805 20.6989 13.0621C20.8985 12.7438 21.0043 12.3757 21.0043 12C21.0043 11.6243 20.8985 11.2561 20.6989 10.9378C20.4994 10.6194 20.2142 10.3637 19.8761 10.2H19.8671ZM17.0071 11H6.79707L5.00707 4.99997L17.0071 11ZM5.00707 19L6.78707 13H17.0071L5.00707 19Z" fill="currentColor" />
+
+        <div className="mobile-panel-footer">
+          <AnimatePresence>
+            {mode === "welcome" && (
+              <motion.div key="suggestions" className="mobile-panel-suggestions" exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                {MOBILE_SUGGESTIONS.map((text) => (
+                  <button key={text} className="mobile-panel-suggestion" onClick={() => handleSend(text)}>
+                    {text}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div className={`mobile-panel-input-wrap${isBusy ? " is-disabled" : ""}`} ref={setInputEl}>
+            <svg
+              className="companion-panel-input-shape"
+              viewBox={inputViewBox}
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path d={inputPath} fill="#ffffff" />
+              <path d={inputPath} fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="1" />
             </svg>
-          </button>
+            <input
+              className="mobile-panel-input"
+              type="text"
+              placeholder="Ask AI Companion"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
+              disabled={isBusy}
+            />
+            <button className="mobile-panel-send" onClick={() => handleSend()} disabled={isBusy}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+                <path d="M19.8671 10.2L5.86707 3.19997C5.52121 3.03254 5.13444 2.96828 4.75302 3.01489C4.3716 3.0615 4.01168 3.21699 3.71632 3.46278C3.42095 3.70857 3.20264 4.03424 3.0875 4.40084C2.97236 4.76744 2.96527 5.15944 3.06707 5.52997L5.00607 12L3.07607 18.47C2.97427 18.8405 2.98136 19.2325 3.0965 19.5991C3.21164 19.9657 3.42995 20.2914 3.72532 20.5372C4.02068 20.7829 4.3806 20.9384 4.76202 20.985C5.14344 21.0317 5.53021 20.9674 5.87607 20.8L19.8761 13.8C20.2142 13.6362 20.4994 13.3805 20.6989 13.0621C20.8985 12.7438 21.0043 12.3757 21.0043 12C21.0043 11.6243 20.8985 11.2561 20.6989 10.9378C20.4994 10.6194 20.2142 10.3637 19.8761 10.2H19.8671ZM17.0071 11H6.79707L5.00707 4.99997L17.0071 11ZM5.00707 19L6.78707 13H17.0071L5.00707 19Z" fill="currentColor" />
+              </svg>
+            </button>
+          </div>
+          <p className="mobile-panel-disclaimer">
+            AI is not always infallible. <a href="#">Learn more</a>
+          </p>
         </div>
       </div>
     </motion.div>
@@ -370,25 +476,22 @@ function Stage2Page({ stage, onStageSelect, launcherOpen, setLauncherOpen, launc
           )}
         </AnimatePresence>
       </div>
-      <div className="iphone-frame">
+      <motion.div
+        className="iphone-frame"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="iphone-notch" />
         <div className="iphone-screen">
           <img className="iphone-app-img" src="/iphone-app.svg" alt="iOS App" draggable={false} />
           <AnimatePresence>
             {panelOpen && <MobilePanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />}
           </AnimatePresence>
-          {!panelOpen && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={SPRING}
-            >
-              <MobileAiButton onClick={() => setPanelOpen(true)} />
-            </motion.div>
-          )}
+          {!panelOpen && <MobileAiButton onClick={() => setPanelOpen(true)} />}
         </div>
         <div className="iphone-home-bar" />
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -501,7 +604,7 @@ function Stage3Page() {
     const observer = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       if (width > 0 && height > 0) {
-        setInputPath(createScalableSquirclePath(width, height, 56));
+        setInputPath(createScalableSquirclePath(width, height, 64));
         setInputViewBox(`0 0 ${width} ${height}`);
       }
     });
