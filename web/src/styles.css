@@ -532,6 +532,65 @@ button {
   text-decoration: none;
 }
 
+/* === Companion Chat Mode === */
+
+.companion-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.companion-message {
+  max-width: 85%;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.companion-message--ai {
+  align-self: flex-start;
+  color: #121212;
+}
+
+.companion-message--user {
+  align-self: flex-end;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 10px 16px;
+  color: #121212;
+}
+
+.companion-thinking {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.companion-thinking-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.companion-thinking-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(18, 18, 18, 0.44);
+}
+
+.companion-panel-input-wrap.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* === Layout Shell === */
 
 .layout-shell {
