@@ -1077,11 +1077,40 @@ button {
 /* === Stage 2: AI as a Connector (iPhone) === */
 
 .stage2-page {
-  height: calc(100vh - 68px);
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #000;
+  position: relative;
+}
+
+.stage2-launcher {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+}
+
+.stage2-launcher-button {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 20px;
+  transition: background-color 140ms ease;
+}
+
+.stage2-launcher-button svg path {
+  fill: #fff;
+}
+
+.stage2-launcher-button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .iphone-frame {

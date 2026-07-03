@@ -335,15 +335,45 @@ function MobilePanel({ isOpen, onClose }) {
   );
 }
 
-function Stage2Page() {
+function Stage2Page({ stage, onStageSelect, launcherOpen, setLauncherOpen, launcherRef }) {
   const [panelOpen, setPanelOpen] = useState(false);
 
   return (
     <div className="stage2-page">
+      <div className="stage2-launcher" ref={launcherRef}>
+        <button
+          className="stage2-launcher-button"
+          aria-label="Apps"
+          onClick={() => setLauncherOpen((prev) => !prev)}
+        >
+          <AppLauncherIcon />
+        </button>
+        <AnimatePresence>
+          {launcherOpen && (
+            <motion.div
+              className="app-launcher-menu"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+            >
+              {STAGES.map((s) => (
+                <button
+                  key={s.id}
+                  className={`app-launcher-item${s.id === stage ? " is-selected" : ""}`}
+                  onClick={() => onStageSelect(s.id)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <div className="iphone-frame">
         <div className="iphone-notch" />
         <div className="iphone-screen">
-          <img className="iphone-app-img" src="/iphone-app.png" alt="iOS App" draggable={false} />
+          <img className="iphone-app-img" src="/iphone-app.svg" alt="iOS App" draggable={false} />
           <AnimatePresence>
             {panelOpen && <MobilePanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />}
           </AnimatePresence>
@@ -624,7 +654,7 @@ function App() {
 
   return (
     <div className="page">
-      <header className="topbar" aria-label="navify header">
+      {stage !== 2 && <header className="topbar" aria-label="navify header">
         <div className="topbar-accent" />
 
         <div className="topbar-inner">
@@ -688,12 +718,18 @@ function App() {
             </button>
           </div>
         </div>
-      </header>
+      </header>}
 
       {stage === 3 ? (
         <Stage3Page />
       ) : stage === 2 ? (
-        <Stage2Page />
+        <Stage2Page
+          stage={stage}
+          onStageSelect={handleStageSelect}
+          launcherOpen={launcherOpen}
+          setLauncherOpen={setLauncherOpen}
+          launcherRef={launcherRef}
+        />
       ) : (
         <>
           <div className="layout-shell">
