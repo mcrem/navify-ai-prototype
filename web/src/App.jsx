@@ -5,6 +5,7 @@ import { Sidebar, NAV_ITEMS } from "./Sidebar";
 import { ContentSkeleton, generateLayout } from "./ContentSkeleton";
 import { CompanionPanel, AI_RESPONSES, THINKING_DELAY_MIN, THINKING_DELAY_MAX, TYPING_SPEED, ThinkingIndicator, TypingMessage, UserBubble } from "./CompanionPanel";
 import { createScalableSquirclePath } from "./squircle";
+import iphoneAppImg from "/iphone-app.svg";
 
 const BUTTON_COLLAPSED_WIDTH = 40;
 const BUTTON_EXPANDED_WIDTH = 148;
@@ -484,7 +485,7 @@ function Stage2Page({ stage, onStageSelect, launcherOpen, setLauncherOpen, launc
       >
         <div className="iphone-notch" />
         <div className="iphone-screen">
-          <img className="iphone-app-img" src="/iphone-app.svg" alt="iOS App" draggable={false} />
+          <img className="iphone-app-img" src={iphoneAppImg} alt="iOS App" draggable={false} />
           <AnimatePresence>
             {panelOpen && <MobilePanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />}
           </AnimatePresence>
