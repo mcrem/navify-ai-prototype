@@ -1073,3 +1073,274 @@ button {
   opacity: 0.5;
   pointer-events: none;
 }
+
+/* === Stage 2: AI as a Connector (iPhone) === */
+
+.stage2-page {
+  height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.iphone-frame {
+  position: relative;
+  width: 395px;
+  height: 856px;
+  background: #1a1a1a;
+  border-radius: 54px;
+  border: 3px solid #333;
+  box-shadow: 0 0 0 2px #000, 0 40px 80px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  transform: scale(0.82);
+  transform-origin: center;
+}
+
+.iphone-notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.iphone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.iphone-app-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.iphone-home-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: #333;
+  border-radius: 3px;
+  z-index: 10;
+}
+
+/* === Mobile AI Button === */
+
+.mobile-ai-button {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  z-index: 5;
+  width: 64px;
+  height: 64px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-ai-button-glow {
+  position: absolute;
+  inset: 0;
+  width: 64px;
+  height: 64px;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.mobile-ai-button-shape {
+  position: absolute;
+  inset: 0;
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+}
+
+.mobile-ai-button-icon {
+  position: relative;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === Mobile Panel === */
+
+.mobile-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 50px;
+}
+
+.mobile-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 56px 20px 0;
+  flex-shrink: 0;
+}
+
+.mobile-panel-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #544f4f;
+}
+
+.mobile-panel-close {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: #544f4f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-panel-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mobile-panel-heading {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 300;
+  color: #000;
+  text-align: center;
+}
+
+.mobile-panel-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 8px;
+  overflow-y: auto;
+  mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%);
+}
+
+.mobile-msg {
+  max-width: 85%;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+}
+
+.mobile-msg--ai {
+  align-self: flex-start;
+  color: #121212;
+}
+
+.mobile-msg--user {
+  align-self: flex-end;
+  color: #121212;
+}
+
+.mobile-panel-footer {
+  flex-shrink: 0;
+  padding: 0 16px 32px;
+}
+
+.mobile-panel-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.mobile-panel-suggestion {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: #0b41cb;
+  text-align: left;
+  cursor: pointer;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-panel-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  height: 40px;
+}
+
+.mobile-panel-input-wrap.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.mobile-panel-input {
+  flex: 1;
+  height: 100%;
+  padding: 0 8px 0 14px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: #121212;
+  outline: none;
+}
+
+.mobile-panel-input::placeholder {
+  color: rgba(18, 18, 18, 0.36);
+}
+
+.mobile-panel-send {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #C2BAB5;
+  flex-shrink: 0;
+}
+
+.mobile-panel-send:hover {
+  color: #544f4f;
+}
