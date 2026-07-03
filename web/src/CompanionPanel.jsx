@@ -8,7 +8,7 @@ const SUGGESTIONS = [
   "What does TAT achievement rate is about?",
 ];
 
-const AI_RESPONSES = [
+export const AI_RESPONSES = [
   "Based on your recent data, reagent consumption has increased by 12% over the last quarter. This is primarily driven by higher test volumes in the immunoassay department. I'd recommend reviewing your calibration frequency and checking for any recent protocol changes.",
   "navify Analytics is a cloud-based laboratory analytics platform that provides real-time visibility into your lab operations. It helps you monitor KPIs, identify bottlenecks, and optimize workflows across your entire instrument fleet.",
   "Your TAT achievement rate measures the percentage of tests completed within the target turnaround time. Currently, your lab is achieving 87% against a 90% target. The main delays appear to be in the pre-analytical phase.",
@@ -20,16 +20,16 @@ const AI_RESPONSES = [
 
 const SPRING = { type: "spring", stiffness: 180, damping: 22, mass: 1 };
 const CORNER_SIZE = 160;
-const THINKING_DELAY_MIN = 2000;
-const THINKING_DELAY_MAX = 4000;
-const TYPING_SPEED = 8;
+export const THINKING_DELAY_MIN = 2000;
+export const THINKING_DELAY_MAX = 4000;
+export const TYPING_SPEED = 8;
 
 const AI_ICON_PATH_1 =
   "M9.99979 0.00390139C9.99629 1.52052 10.0138 2.91422 10.2292 4.07233C10.4417 5.21433 10.8336 6.04554 11.394 6.60595C11.9544 7.16635 12.7856 7.55826 13.9276 7.77072C15.0857 7.98613 16.4794 8.00367 17.996 8.00017L18 9.99972C16.5105 10.0032 14.9331 9.99104 13.5625 9.73611C12.1758 9.47819 10.9194 8.95882 9.98026 8.01969C9.04113 7.08056 8.52176 5.82412 8.26384 4.43748C8.00891 3.06687 7.9968 1.48942 8.00023 -3.81472e-06L9.99979 0.00390139Z";
 const AI_ICON_PATH_2 =
   "M8.00015 17.996C8.00365 16.4793 7.98612 15.0856 7.77071 13.9275C7.55825 12.7855 7.16633 11.9543 6.60593 11.3939C6.04552 10.8335 5.2143 10.4416 4.07232 10.2291C2.9142 10.0137 1.5205 9.99619 0.003889 9.9997L-1.62125e-05 8.00014C1.48941 7.9967 3.06685 8.00882 4.43747 8.26375C5.82411 8.52167 7.08055 9.04105 8.01968 9.98017C8.95881 10.9193 9.47818 12.1757 9.73609 13.5624C9.99103 14.933 10.0031 16.5104 9.99971 17.9999L8.00015 17.996Z";
 
-function UserBubble({ children }) {
+export function UserBubble({ children }) {
   const [el, setEl] = useState(null);
   const [path, setPath] = useState("");
   const [vb, setVb] = useState("0 0 100 40");
@@ -72,7 +72,7 @@ function SendIcon() {
   );
 }
 
-function ThinkingIndicator() {
+export function ThinkingIndicator() {
   const id = useId().replaceAll(":", "");
   const gradId = `${id}-thinking-grad`;
 
@@ -106,7 +106,7 @@ function ThinkingIndicator() {
   );
 }
 
-function TypingMessage({ text, onComplete, scrollRef }) {
+export function TypingMessage({ text, onComplete, scrollRef }) {
   const [displayed, setDisplayed] = useState("");
   const indexRef = useRef(0);
   const onCompleteRef = useRef(onComplete);

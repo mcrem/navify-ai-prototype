@@ -3,7 +3,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { NavifyLogo, AppLauncherIcon, NotificationIcon, RocheLogo, AiCompanionIcon } from "./icons";
 import { Sidebar, NAV_ITEMS } from "./Sidebar";
 import { ContentSkeleton, generateLayout } from "./ContentSkeleton";
-import { CompanionPanel } from "./CompanionPanel";
+import { CompanionPanel, AI_RESPONSES, THINKING_DELAY_MIN, THINKING_DELAY_MAX, TYPING_SPEED, ThinkingIndicator, TypingMessage, UserBubble } from "./CompanionPanel";
 import { createScalableSquirclePath } from "./squircle";
 
 const BUTTON_COLLAPSED_WIDTH = 40;
@@ -144,12 +144,110 @@ function AiCompanionLogo() {
   );
 }
 
+const SPRING = { type: "spring", stiffness: 180, damping: 22, mass: 1 };
+
+function Stage3Input({ inputEl, setInputEl, inputPath, inputViewBox, glowGradientId, inputValue, onInputChange, onKeyDown, onSend, disabled }) {
+  return (
+    <div className={`stage3-input-wrap${disabled ? " is-disabled" : ""}`} ref={setInputEl}>
+      <svg className="stage3-input-glow" viewBox={inputViewBox} preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id={glowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
+            <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
+            <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
+            <animate attributeName="x1" values="0%;100%;100%;0%;0%" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="y1" values="0%;0%;100%;100%;0%" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="x2" values="100%;0%;0%;100%;100%" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="y2" values="100%;100%;0%;0%;100%" dur="8s" repeatCount="indefinite" />
+          </linearGradient>
+        </defs>
+        <path d={inputPath} fill={`url(#${glowGradientId})`} />
+      </svg>
+      <svg className="stage3-input-shape" viewBox={inputViewBox} preserveAspectRatio="none" aria-hidden="true">
+        <path d={inputPath} fill="#ffffff" />
+        <path d={inputPath} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
+      </svg>
+      <input
+        className="stage3-input"
+        type="text"
+        placeholder="Ask navify AI Companion"
+        aria-label="Ask AI Companion"
+        value={inputValue}
+        onChange={onInputChange}
+        onKeyDown={onKeyDown}
+        disabled={disabled}
+      />
+      <button className="stage3-send" aria-label="Send" onClick={onSend} disabled={disabled}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+          <path d="M19.8671 10.2L5.86707 3.19997C5.52121 3.03254 5.13444 2.96828 4.75302 3.01489C4.3716 3.0615 4.01168 3.21699 3.71632 3.46278C3.42095 3.70857 3.20264 4.03424 3.0875 4.40084C2.97236 4.76744 2.96527 5.15944 3.06707 5.52997L5.00607 12L3.07607 18.47C2.97427 18.8405 2.98136 19.2325 3.0965 19.5991C3.21164 19.9657 3.42995 20.2914 3.72532 20.5372C4.02068 20.7829 4.3806 20.9384 4.76202 20.985C5.14344 21.0317 5.53021 20.9674 5.87607 20.8L19.8761 13.8C20.2142 13.6362 20.4994 13.3805 20.6989 13.0621C20.8985 12.7438 21.0043 12.3757 21.0043 12C21.0043 11.6243 20.8985 11.2561 20.6989 10.9378C20.4994 10.6194 20.2142 10.3637 19.8761 10.2H19.8671ZM17.0071 11H6.79707L5.00707 4.99997L17.0071 11ZM5.00707 19L6.78707 13H17.0071L5.00707 19Z" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 function Stage3Page() {
   const [inputEl, setInputEl] = useState(null);
   const [inputPath, setInputPath] = useState("");
   const [inputViewBox, setInputViewBox] = useState("0 0 100 56");
   const glowId = useId().replaceAll(":", "");
   const glowGradientId = `${glowId}-s3-glow`;
+
+  const [mode, setMode] = useState("welcome");
+  const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [isThinking, setIsThinking] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const thinkingTimer = useRef(null);
+  const responseIndex = useRef(0);
+  const chatAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (chatAreaRef.current) {
+      chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
+    }
+  }, [messages, isThinking, isTyping]);
+
+  const handleTypingComplete = useCallback((msgIndex) => {
+    setMessages((prev) =>
+      prev.map((m, i) => (i === msgIndex ? { ...m, typed: true } : m))
+    );
+    setIsTyping(false);
+  }, []);
+
+  const handleSend = useCallback(
+    (overrideText) => {
+      const text = (overrideText || inputValue).trim();
+      if (!text || isThinking || isTyping) return;
+
+      const isFirstMessage = mode === "welcome";
+
+      setMessages((prev) => {
+        const updated = isFirstMessage
+          ? [{ text: "Moritz, how can I assist you?", sender: "ai", typed: true }, { text, sender: "user" }]
+          : [...prev, { text, sender: "user" }];
+        return updated;
+      });
+
+      setInputValue("");
+      setMode("chat");
+      setIsThinking(true);
+
+      const delay = THINKING_DELAY_MIN + Math.random() * (THINKING_DELAY_MAX - THINKING_DELAY_MIN);
+      thinkingTimer.current = setTimeout(() => {
+        const response = AI_RESPONSES[responseIndex.current % AI_RESPONSES.length];
+        responseIndex.current += 1;
+        setMessages((prev) => [...prev, { text: response, sender: "ai", typed: false }]);
+        setIsThinking(false);
+        setIsTyping(true);
+      }, delay);
+    },
+    [inputValue, isThinking, isTyping, mode]
+  );
+
+  useEffect(() => {
+    return () => clearTimeout(thinkingTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!inputEl) return;
@@ -164,73 +262,98 @@ function Stage3Page() {
     return () => observer.disconnect();
   }, [inputEl]);
 
+  const isBusy = isThinking || isTyping;
+
+  const inputProps = {
+    inputEl, setInputEl, inputPath, inputViewBox, glowGradientId,
+    inputValue,
+    onInputChange: (e) => setInputValue(e.target.value),
+    onKeyDown: (e) => { if (e.key === "Enter") handleSend(); },
+    onSend: () => handleSend(),
+    disabled: isBusy,
+  };
+
   return (
     <div className="stage3-page">
-      <div className="stage3-content">
-        <motion.h1
-          className="stage3-greeting"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-        >
-          Moritz, how can I assist you?
-        </motion.h1>
-        <motion.div
-          className="stage3-input-wrap"
-          ref={setInputEl}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-        >
-          <svg
-            className="stage3-input-glow"
-            viewBox={inputViewBox}
-            preserveAspectRatio="none"
-            aria-hidden="true"
+      <AnimatePresence mode="popLayout">
+        {mode === "welcome" ? (
+          <motion.div
+            key="welcome"
+            className="stage3-content"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           >
-            <defs>
-              <linearGradient id={glowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
-                <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
-                <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
-                <animate attributeName="x1" values="0%;100%;100%;0%;0%" dur="8s" repeatCount="indefinite" />
-                <animate attributeName="y1" values="0%;0%;100%;100%;0%" dur="8s" repeatCount="indefinite" />
-                <animate attributeName="x2" values="100%;0%;0%;100%;100%" dur="8s" repeatCount="indefinite" />
-                <animate attributeName="y2" values="100%;100%;0%;0%;100%" dur="8s" repeatCount="indefinite" />
-              </linearGradient>
-            </defs>
-            <path d={inputPath} fill={`url(#${glowGradientId})`} />
-          </svg>
-          <svg
-            className="stage3-input-shape"
-            viewBox={inputViewBox}
-            preserveAspectRatio="none"
-            aria-hidden="true"
+            <motion.h1
+              className="stage3-greeting"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            >
+              Moritz, how can I assist you?
+            </motion.h1>
+            <motion.div
+              layoutId="stage3-input"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+              style={{ width: "100%" }}
+            >
+              <Stage3Input {...inputProps} />
+            </motion.div>
+            <motion.p
+              className="stage3-disclaimer"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              AI is not always infallible. <a href="#">Learn more</a>
+            </motion.p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="chat"
+            className="stage3-chat-layout"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
           >
-            <path d={inputPath} fill="#ffffff" />
-            <path d={inputPath} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
-          </svg>
-          <input
-            className="stage3-input"
-            type="text"
-            placeholder="Ask navify AI Companion"
-            aria-label="Ask AI Companion"
-          />
-          <button className="stage3-send" aria-label="Send">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
-              <path d="M19.8671 10.2L5.86707 3.19997C5.52121 3.03254 5.13444 2.96828 4.75302 3.01489C4.3716 3.0615 4.01168 3.21699 3.71632 3.46278C3.42095 3.70857 3.20264 4.03424 3.0875 4.40084C2.97236 4.76744 2.96527 5.15944 3.06707 5.52997L5.00607 12L3.07607 18.47C2.97427 18.8405 2.98136 19.2325 3.0965 19.5991C3.21164 19.9657 3.42995 20.2914 3.72532 20.5372C4.02068 20.7829 4.3806 20.9384 4.76202 20.985C5.14344 21.0317 5.53021 20.9674 5.87607 20.8L19.8761 13.8C20.2142 13.6362 20.4994 13.3805 20.6989 13.0621C20.8985 12.7438 21.0043 12.3757 21.0043 12C21.0043 11.6243 20.8985 11.2561 20.6989 10.9378C20.4994 10.6194 20.2142 10.3637 19.8761 10.2H19.8671ZM17.0071 11H6.79707L5.00707 4.99997L17.0071 11ZM5.00707 19L6.78707 13H17.0071L5.00707 19Z" fill="currentColor" />
-            </svg>
-          </button>
-        </motion.div>
-        <motion.p
-          className="stage3-disclaimer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-        >
-          AI is not always infallible. <a href="#">Learn more</a>
-        </motion.p>
-      </div>
+            <div className="stage3-chat-area" ref={chatAreaRef}>
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={i}
+                  className={`companion-message companion-message--${msg.sender}`}
+                  initial={{ opacity: 0, x: msg.sender === "ai" ? -12 : 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ ...SPRING, delay: i < 2 ? i * 0.1 : 0.05 }}
+                >
+                  {msg.sender === "user" ? (
+                    <UserBubble>{msg.text}</UserBubble>
+                  ) : !msg.typed ? (
+                    <TypingMessage
+                      text={msg.text}
+                      onComplete={() => handleTypingComplete(i)}
+                      scrollRef={chatAreaRef}
+                    />
+                  ) : (
+                    msg.text
+                  )}
+                </motion.div>
+              ))}
+              <AnimatePresence>
+                {isThinking && <ThinkingIndicator />}
+              </AnimatePresence>
+            </div>
+            <div className="stage3-footer">
+              <motion.div layoutId="stage3-input">
+                <Stage3Input {...inputProps} />
+              </motion.div>
+              <p className="stage3-disclaimer">
+                AI is not always infallible. <a href="#">Learn more</a>
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

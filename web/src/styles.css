@@ -1034,3 +1034,42 @@ button {
   color: #0d4bdb;
   text-decoration: none;
 }
+
+/* === Stage 3 Chat Mode === */
+
+.stage3-chat-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.stage3-chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 0;
+  overflow-y: auto;
+  mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black calc(100% - 40px), transparent 100%);
+}
+
+.stage3-footer {
+  flex-shrink: 0;
+  padding-bottom: 24px;
+}
+
+.stage3-footer .stage3-disclaimer {
+  margin-top: 8px;
+}
+
+.stage3-input-wrap.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
