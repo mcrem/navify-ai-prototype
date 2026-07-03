@@ -22,6 +22,7 @@ const SPRING = { type: "spring", stiffness: 180, damping: 22, mass: 1 };
 const CORNER_SIZE = 160;
 const THINKING_DELAY_MIN = 2000;
 const THINKING_DELAY_MAX = 4000;
+const TYPING_SPEED = 8;
 
 const AI_ICON_PATH_1 =
   "M9.99979 0.00390139C9.99629 1.52052 10.0138 2.91422 10.2292 4.07233C10.4417 5.21433 10.8336 6.04554 11.394 6.60595C11.9544 7.16635 12.7856 7.55826 13.9276 7.77072C15.0857 7.98613 16.4794 8.00367 17.996 8.00017L18 9.99972C16.5105 10.0032 14.9331 9.99104 13.5625 9.73611C12.1758 9.47819 10.9194 8.95882 9.98026 8.01969C9.04113 7.08056 8.52176 5.82412 8.26384 4.43748C8.00891 3.06687 7.9968 1.48942 8.00023 -3.81472e-06L9.99979 0.00390139Z";
@@ -70,6 +71,34 @@ function ThinkingIndicator() {
   );
 }
 
+function TypingMessage({ text, onComplete, scrollRef }) {
+  const [displayed, setDisplayed] = useState("");
+  const indexRef = useRef(0);
+
+  useEffect(() => {
+    indexRef.current = 0;
+    setDisplayed("");
+
+    const interval = setInterval(() => {
+      indexRef.current += 1;
+      if (indexRef.current >= text.length) {
+        setDisplayed(text);
+        clearInterval(interval);
+        if (onComplete) onComplete();
+      } else {
+        setDisplayed(text.slice(0, indexRef.current));
+      }
+      if (scrollRef?.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }, TYPING_SPEED);
+
+    return () => clearInterval(interval);
+  }, [text, onComplete, scrollRef]);
+
+  return <>{displayed}</>;
+}
+
 export function CompanionPanel({ isOpen, onClose }) {
   const [panelEl, setPanelEl] = useState(null);
   const [squirclePath, setSquirclePath] = useState("");
@@ -84,9 +113,11 @@ export function CompanionPanel({ isOpen, onClose }) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
   const [isThinking, setIsThinking] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const thinkingTimer = useRef(null);
   const responseIndex = useRef(0);
   const chatAreaRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -95,6 +126,8 @@ export function CompanionPanel({ isOpen, onClose }) {
       setInputValue("");
       setMessages([]);
       setIsThinking(false);
+      setIsTyping(false);
+      setScrolled(false);
       responseIndex.current = 0;
     }
   }, [isOpen]);
@@ -103,18 +136,31 @@ export function CompanionPanel({ isOpen, onClose }) {
     if (chatAreaRef.current) {
       chatAreaRef.current.scrollTop = chatAreaRef.current.scrollHeight;
     }
-  }, [messages, isThinking]);
+  }, [messages, isThinking, isTyping]);
+
+  const handleScroll = useCallback(() => {
+    if (chatAreaRef.current) {
+      setScrolled(chatAreaRef.current.scrollTop > 8);
+    }
+  }, []);
+
+  const handleTypingComplete = useCallback((msgIndex) => {
+    setMessages((prev) =>
+      prev.map((m, i) => (i === msgIndex ? { ...m, typed: true } : m))
+    );
+    setIsTyping(false);
+  }, []);
 
   const handleSend = useCallback(
     (overrideText) => {
       const text = (overrideText || inputValue).trim();
-      if (!text || isThinking) return;
+      if (!text || isThinking || isTyping) return;
 
       const isFirstMessage = mode === "welcome";
 
       setMessages((prev) => {
         const updated = isFirstMessage
-          ? [{ text: "How can I help?", sender: "ai" }, { text, sender: "user" }]
+          ? [{ text: "How can I help?", sender: "ai", typed: true }, { text, sender: "user" }]
           : [...prev, { text, sender: "user" }];
         return updated;
       });
@@ -127,11 +173,12 @@ export function CompanionPanel({ isOpen, onClose }) {
       thinkingTimer.current = setTimeout(() => {
         const response = AI_RESPONSES[responseIndex.current % AI_RESPONSES.length];
         responseIndex.current += 1;
-        setMessages((prev) => [...prev, { text: response, sender: "ai" }]);
+        setMessages((prev) => [...prev, { text: response, sender: "ai", typed: false }]);
         setIsThinking(false);
+        setIsTyping(true);
       }, delay);
     },
-    [inputValue, isThinking, mode]
+    [inputValue, isThinking, isTyping, mode]
   );
 
   useEffect(() => {
@@ -165,6 +212,8 @@ export function CompanionPanel({ isOpen, onClose }) {
     observer.observe(inputEl);
     return () => observer.disconnect();
   }, [inputEl]);
+
+  const isBusy = isThinking || isTyping;
 
   return (
     <AnimatePresence>
@@ -257,8 +306,9 @@ export function CompanionPanel({ isOpen, onClose }) {
               ) : (
                 <motion.div
                   key="chat"
-                  className="companion-chat-area"
+                  className={`companion-chat-area${scrolled ? " is-scrolled" : ""}`}
                   ref={chatAreaRef}
+                  onScroll={handleScroll}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.25 }}
@@ -271,7 +321,15 @@ export function CompanionPanel({ isOpen, onClose }) {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ ...SPRING, delay: i < 2 ? i * 0.1 : 0.05 }}
                     >
-                      {msg.text}
+                      {msg.sender === "ai" && !msg.typed ? (
+                        <TypingMessage
+                          text={msg.text}
+                          onComplete={() => handleTypingComplete(i)}
+                          scrollRef={chatAreaRef}
+                        />
+                      ) : (
+                        msg.text
+                      )}
                     </motion.div>
                   ))}
                   <AnimatePresence>
@@ -310,7 +368,7 @@ export function CompanionPanel({ isOpen, onClose }) {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div className={`companion-panel-input-wrap${isThinking ? " is-disabled" : ""}`} ref={setInputEl}>
+              <div className={`companion-panel-input-wrap${isBusy ? " is-disabled" : ""}`} ref={setInputEl}>
                 <svg
                   className="companion-panel-input-shape"
                   viewBox={inputViewBox}
@@ -328,13 +386,13 @@ export function CompanionPanel({ isOpen, onClose }) {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
-                  disabled={isThinking}
+                  disabled={isBusy}
                 />
                 <button
                   className="companion-panel-send"
                   aria-label="Send"
                   onClick={() => handleSend()}
-                  disabled={isThinking}
+                  disabled={isBusy}
                 >
                   <SendIcon />
                 </button>
