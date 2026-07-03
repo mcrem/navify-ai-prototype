@@ -68,9 +68,9 @@ export function CompanionPanel({ isOpen, onClose }) {
           >
             <defs>
               <linearGradient id={glowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#A855F7" stopOpacity="0.35" />
-                <stop offset="50%" stopColor="#1582F8" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#79E22D" stopOpacity="0.2" />
+                <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
+                <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
+                <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
                 <animate attributeName="x1" values="0%;100%;100%;0%;0%" dur="8s" repeatCount="indefinite" />
                 <animate attributeName="y1" values="0%;0%;100%;100%;0%" dur="8s" repeatCount="indefinite" />
                 <animate attributeName="x2" values="100%;0%;0%;100%;100%" dur="8s" repeatCount="indefinite" />

@@ -62,14 +62,14 @@ function AiCompanionButton({ onClick }) {
       >
         <defs>
           <linearGradient id={glowGradientId} x1="12%" y1="10%" x2="88%" y2="90%">
-            <stop offset="0%" stopColor="#A855F7" stopOpacity="0.54" />
-            <stop offset="50%" stopColor="#1582F8" stopOpacity="0.44" />
-            <stop offset="100%" stopColor="#79E22D" stopOpacity="0.34" />
+            <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
+            <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
+            <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
           </linearGradient>
           <linearGradient id={activeGlowGradientId} x1="12%" y1="10%" x2="88%" y2="90%">
-            <stop offset="0%" stopColor="#A855F7" stopOpacity="0.54" />
-            <stop offset="50%" stopColor="#1582F8" stopOpacity="0.44" />
-            <stop offset="100%" stopColor="#79E22D" stopOpacity="0.34" />
+            <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
+            <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
+            <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
           </linearGradient>
         </defs>
         <motion.path className="ai-button-glow-static" d={shapePath} fill={`url(#${glowGradientId})`} />
