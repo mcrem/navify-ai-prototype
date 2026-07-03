@@ -127,8 +127,52 @@ button {
   transition: background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-.actions-group > .icon-button:first-child {
+.actions-group > .icon-button:first-child,
+.actions-group > .app-launcher-wrap:first-child {
   margin-left: 24px;
+}
+
+.app-launcher-wrap {
+  position: relative;
+}
+
+.app-launcher-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  white-space: nowrap;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 6px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-launcher-item {
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  color: #121212;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 140ms ease;
+}
+
+.app-launcher-item:hover {
+  background: rgba(18, 18, 18, 0.05);
+}
+
+.app-launcher-item.is-selected {
+  background: rgba(13, 75, 219, 0.08);
+  color: #0b41cb;
+  font-weight: 500;
 }
 
 .actions-group > .icon-button + .icon-button {

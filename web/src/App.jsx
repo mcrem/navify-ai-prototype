@@ -114,6 +114,8 @@ function AiCompanionButton({ onClick }) {
 function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [panelOpen, setPanelOpen] = useState(false);
+  const [launcherOpen, setLauncherOpen] = useState(false);
+  const launcherRef = useRef(null);
   const [scene, setScene] = useState({
     key: 1,
     title: "Welcome",
@@ -122,6 +124,17 @@ function App() {
   useEffect(() => {
     document.title = "navify® Analytics";
   }, []);
+
+  useEffect(() => {
+    if (!launcherOpen) return;
+    function handleClickOutside(e) {
+      if (launcherRef.current && !launcherRef.current.contains(e.target)) {
+        setLauncherOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [launcherOpen]);
 
   function handleSectionSelect(sectionId) {
     if (sectionId === activeSection) {
@@ -153,9 +166,36 @@ function App() {
           </div>
 
           <div className="actions-group">
-            <button className="icon-button" aria-label="Apps">
-              <AppLauncherIcon />
-            </button>
+            <div className="app-launcher-wrap" ref={launcherRef}>
+              <button
+                className="icon-button"
+                aria-label="Apps"
+                onClick={() => setLauncherOpen((prev) => !prev)}
+              >
+                <AppLauncherIcon />
+              </button>
+              <AnimatePresence>
+                {launcherOpen && (
+                  <motion.div
+                    className="app-launcher-menu"
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                  >
+                    {["Stage 1: AI as a Feature", "Stage 2: AI as a Connector", "Stage 3: AI as a Platform"].map((label, i) => (
+                      <button
+                        key={label}
+                        className={`app-launcher-item${i === 0 ? " is-selected" : ""}`}
+                        onClick={() => setLauncherOpen(false)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <button className="icon-button" aria-label="Notifications">
               <NotificationIcon />
             </button>
