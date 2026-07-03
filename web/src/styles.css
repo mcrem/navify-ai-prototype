@@ -460,7 +460,7 @@ button {
 
 .companion-panel-footer {
   flex-shrink: 0;
-  padding: 0 28px 64px;
+  padding: 0 24px 64px;
 }
 
 .companion-panel-input-wrap {
@@ -479,6 +479,8 @@ button {
 }
 
 .companion-panel-input {
+  position: relative;
+  z-index: 1;
   flex: 1;
   height: 48px;
   padding: 0 48px 0 18px;
@@ -498,6 +500,7 @@ button {
 
 .companion-panel-send {
   position: absolute;
+  z-index: 1;
   right: 6px;
   width: 36px;
   height: 36px;
@@ -517,9 +520,9 @@ button {
 }
 
 .companion-panel-disclaimer {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
+  height: 16px;
   font-size: 12px;
-  line-height: 16px;
   color: rgba(18, 18, 18, 0.4);
   text-align: center;
 }
