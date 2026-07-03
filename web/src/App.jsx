@@ -186,7 +186,7 @@ function MobileAiButton({ onClick }) {
   );
 }
 
-const MOBILE_CORNER_SIZE = 80;
+const MOBILE_CORNER_SIZE = 44;
 
 function MobilePanel({ isOpen, onClose }) {
   const [panelEl, setPanelEl] = useState(null);
@@ -207,6 +207,19 @@ function MobilePanel({ isOpen, onClose }) {
   const responseIndex = useRef(0);
   const chatAreaRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const handleDragEnd = useCallback((event, info) => {
+    if (info.offset.y < -30 || info.velocity.y < -300) {
+      setExpanded(true);
+    } else if (info.offset.y > 30 || info.velocity.y > 300) {
+      if (expanded) {
+        setExpanded(false);
+      } else {
+        onClose();
+      }
+    }
+  }, [expanded, onClose]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -217,6 +230,7 @@ function MobilePanel({ isOpen, onClose }) {
       setIsThinking(false);
       setIsTyping(false);
       setScrolled(false);
+      setExpanded(false);
       responseIndex.current = 0;
     }
   }, [isOpen]);
@@ -304,7 +318,7 @@ function MobilePanel({ isOpen, onClose }) {
       className="mobile-panel"
       ref={setPanelEl}
       initial={{ y: "100%", opacity: 0.8 }}
-      animate={{ y: 0, opacity: 1 }}
+      animate={{ y: 0, opacity: 1, top: expanded ? "9%" : "38%" }}
       exit={{ y: "100%", opacity: 0.8 }}
       transition={{ type: "spring", stiffness: 260, damping: 28 }}
     >
@@ -339,23 +353,32 @@ function MobilePanel({ isOpen, onClose }) {
       </svg>
 
       <div className="mobile-panel-content">
-        <div className="mobile-panel-header">
-          <span className="mobile-panel-title">AI Companion</span>
-          <svg
-            className="mobile-panel-close"
-            width="16"
-            height="16"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            onClick={onClose}
-            role="button"
-            tabIndex={0}
-            style={{ display: "block", cursor: "pointer" }}
-          >
-            <path fillRule="evenodd" clipRule="evenodd" d="M16.645 4.53001L15.4708 3.35501L9.99998 8.82501L4.50915 3.33334L3.33331 4.50834L8.82498 10L3.33331 15.4917L4.50915 16.6667L9.99998 11.175L15.4916 16.6667L16.6666 15.4917L11.1758 10L16.645 4.53001Z" fill="#544f4f" />
-          </svg>
-        </div>
+        <motion.div
+          className="mobile-panel-drag-region"
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={0.05}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="mobile-panel-handle" />
+          <div className="mobile-panel-header">
+            <span className="mobile-panel-title">AI Companion</span>
+            <svg
+              className="mobile-panel-close"
+              width="16"
+              height="16"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              onClick={onClose}
+              role="button"
+              tabIndex={0}
+              style={{ display: "block", cursor: "pointer" }}
+            >
+              <path fillRule="evenodd" clipRule="evenodd" d="M16.645 4.53001L15.4708 3.35501L9.99998 8.82501L4.50915 3.33334L3.33331 4.50834L8.82498 10L3.33331 15.4917L4.50915 16.6667L9.99998 11.175L15.4916 16.6667L16.6666 15.4917L11.1758 10L16.645 4.53001Z" fill="#544f4f" />
+            </svg>
+          </div>
+        </motion.div>
 
         <AnimatePresence mode="wait">
           {mode === "welcome" ? (
@@ -487,6 +510,16 @@ function Stage2Page({ stage, onStageSelect, launcherOpen, setLauncherOpen, launc
         <div className="iphone-screen">
           <img className="iphone-app-img" src={iphoneAppImg} alt="iOS App" draggable={false} />
           <AnimatePresence>
+            {panelOpen && (
+              <motion.div
+                className="mobile-panel-scrim"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setPanelOpen(false)}
+              />
+            )}
             {panelOpen && <MobilePanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />}
           </AnimatePresence>
           {!panelOpen && <MobileAiButton onClick={() => setPanelOpen(true)} />}
@@ -575,7 +608,7 @@ function Stage3Page() {
 
       setMessages((prev) => {
         const updated = isFirstMessage
-          ? [{ text: "Moritz, how can I assist you?", sender: "ai", typed: true }, { text, sender: "user" }]
+          ? [{ text: "Moritz, how can I help?", sender: "ai", typed: true }, { text, sender: "user" }]
           : [...prev, { text, sender: "user" }];
         return updated;
       });
@@ -640,7 +673,7 @@ function Stage3Page() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
             >
-              Moritz, how can I assist you?
+              Moritz, how can I help?
             </motion.h1>
             <motion.div
               layoutId="stage3-input"
@@ -814,7 +847,7 @@ function App() {
             <span className="vertical-divider" aria-hidden="true" />
 
             <button className="profile-chip" aria-label="User profile">
-              MC
+              MH
             </button>
 
             <button className="roche-badge" aria-label="Roche">
