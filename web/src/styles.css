@@ -874,3 +874,137 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+/* === AI Companion Logo (Stage 3 header) === */
+
+.ai-logo {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-logo-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ai-logo-icon {
+  position: relative;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === Stage 3: AI as a Platform === */
+
+.stage3-page {
+  height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.stage3-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 600px;
+  padding: 0 24px;
+}
+
+.stage3-greeting {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 300;
+  color: #000;
+  text-align: center;
+}
+
+.stage3-input-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.stage3-input-glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: blur(10px);
+  opacity: 1;
+}
+
+.stage3-input-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.stage3-input {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  height: 56px;
+  padding: 0 56px 0 24px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  color: #121212;
+  outline: none;
+}
+
+.stage3-input::placeholder {
+  color: rgba(18, 18, 18, 0.36);
+}
+
+.stage3-send {
+  position: absolute;
+  z-index: 1;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #C2BAB5;
+  transition: color 200ms ease;
+}
+
+.stage3-send:hover {
+  color: #544f4f;
+}
+
+.stage3-disclaimer {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(18, 18, 18, 0.4);
+  text-align: center;
+}
+
+.stage3-disclaimer a {
+  color: #0d4bdb;
+  text-decoration: none;
+}

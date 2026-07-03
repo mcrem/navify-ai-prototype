@@ -10,6 +10,12 @@ const BUTTON_COLLAPSED_WIDTH = 40;
 const BUTTON_EXPANDED_WIDTH = 148;
 const BUTTON_HEIGHT = 40;
 
+const STAGES = [
+  { id: 1, label: "Stage 1: AI as a Feature" },
+  { id: 2, label: "Stage 2: AI as a Connector" },
+  { id: 3, label: "Stage 3: AI as a Platform" },
+];
+
 function AiCompanionButton({ onClick }) {
   const [hovered, setHovered] = useState(false);
   const hoverTimer = useRef(null);
@@ -111,19 +117,139 @@ function AiCompanionButton({ onClick }) {
   );
 }
 
+function AiCompanionLogo() {
+  const gradientId = useId().replaceAll(":", "");
+  const path = createScalableSquirclePath(BUTTON_COLLAPSED_WIDTH, BUTTON_HEIGHT);
+
+  return (
+    <span className="ai-logo" aria-hidden="true">
+      <svg
+        className="ai-logo-shape"
+        viewBox={`0 0 ${BUTTON_COLLAPSED_WIDTH} ${BUTTON_HEIGHT}`}
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="10%" y1="8%" x2="90%" y2="92%">
+            <stop offset="0%" stopColor="#A855F7" />
+            <stop offset="50%" stopColor="#238EF2" />
+            <stop offset="100%" stopColor="#79E22D" />
+          </linearGradient>
+        </defs>
+        <path d={path} fill={`url(#${gradientId})`} />
+      </svg>
+      <span className="ai-logo-icon">
+        <AiCompanionIcon className="ai-button-icon" />
+      </span>
+    </span>
+  );
+}
+
+function Stage3Page() {
+  const [inputEl, setInputEl] = useState(null);
+  const [inputPath, setInputPath] = useState("");
+  const [inputViewBox, setInputViewBox] = useState("0 0 100 56");
+  const glowId = useId().replaceAll(":", "");
+  const glowGradientId = `${glowId}-s3-glow`;
+
+  useEffect(() => {
+    if (!inputEl) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        setInputPath(createScalableSquirclePath(width, height, 56));
+        setInputViewBox(`0 0 ${width} ${height}`);
+      }
+    });
+    observer.observe(inputEl);
+    return () => observer.disconnect();
+  }, [inputEl]);
+
+  return (
+    <div className="stage3-page">
+      <div className="stage3-content">
+        <motion.h1
+          className="stage3-greeting"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        >
+          Moritz, how can I assist you?
+        </motion.h1>
+        <motion.div
+          className="stage3-input-wrap"
+          ref={setInputEl}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+        >
+          <svg
+            className="stage3-input-glow"
+            viewBox={inputViewBox}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id={glowGradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#A855F7" stopOpacity="1" />
+                <stop offset="50%" stopColor="#1582F8" stopOpacity="1" />
+                <stop offset="100%" stopColor="#79E22D" stopOpacity="1" />
+                <animate attributeName="x1" values="0%;100%;100%;0%;0%" dur="8s" repeatCount="indefinite" />
+                <animate attributeName="y1" values="0%;0%;100%;100%;0%" dur="8s" repeatCount="indefinite" />
+                <animate attributeName="x2" values="100%;0%;0%;100%;100%" dur="8s" repeatCount="indefinite" />
+                <animate attributeName="y2" values="100%;100%;0%;0%;100%" dur="8s" repeatCount="indefinite" />
+              </linearGradient>
+            </defs>
+            <path d={inputPath} fill={`url(#${glowGradientId})`} />
+          </svg>
+          <svg
+            className="stage3-input-shape"
+            viewBox={inputViewBox}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path d={inputPath} fill="#ffffff" />
+            <path d={inputPath} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
+          </svg>
+          <input
+            className="stage3-input"
+            type="text"
+            placeholder="Ask navify AI Companion"
+            aria-label="Ask AI Companion"
+          />
+          <button className="stage3-send" aria-label="Send">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+              <path d="M19.8671 10.2L5.86707 3.19997C5.52121 3.03254 5.13444 2.96828 4.75302 3.01489C4.3716 3.0615 4.01168 3.21699 3.71632 3.46278C3.42095 3.70857 3.20264 4.03424 3.0875 4.40084C2.97236 4.76744 2.96527 5.15944 3.06707 5.52997L5.00607 12L3.07607 18.47C2.97427 18.8405 2.98136 19.2325 3.0965 19.5991C3.21164 19.9657 3.42995 20.2914 3.72532 20.5372C4.02068 20.7829 4.3806 20.9384 4.76202 20.985C5.14344 21.0317 5.53021 20.9674 5.87607 20.8L19.8761 13.8C20.2142 13.6362 20.4994 13.3805 20.6989 13.0621C20.8985 12.7438 21.0043 12.3757 21.0043 12C21.0043 11.6243 20.8985 11.2561 20.6989 10.9378C20.4994 10.6194 20.2142 10.3637 19.8761 10.2H19.8671ZM17.0071 11H6.79707L5.00707 4.99997L17.0071 11ZM5.00707 19L6.78707 13H17.0071L5.00707 19Z" fill="currentColor" />
+            </svg>
+          </button>
+        </motion.div>
+        <motion.p
+          className="stage3-disclaimer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          AI is not always infallible. <a href="#">Learn more</a>
+        </motion.p>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [panelOpen, setPanelOpen] = useState(false);
   const [launcherOpen, setLauncherOpen] = useState(false);
+  const [stage, setStage] = useState(1);
   const launcherRef = useRef(null);
   const [scene, setScene] = useState({
     key: 1,
     title: "Welcome",
     layout: generateLayout("home"),
   });
+
   useEffect(() => {
-    document.title = "navify® Analytics";
-  }, []);
+    document.title = stage === 3 ? "navify® AI Companion" : "navify® Analytics";
+  }, [stage]);
 
   useEffect(() => {
     if (!launcherOpen) return;
@@ -136,16 +262,18 @@ function App() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [launcherOpen]);
 
+  function handleStageSelect(stageId) {
+    setStage(stageId);
+    setLauncherOpen(false);
+    if (stageId !== 3) {
+      setPanelOpen(false);
+    }
+  }
+
   function handleSectionSelect(sectionId) {
-    if (sectionId === activeSection) {
-      return;
-    }
-
+    if (sectionId === activeSection) return;
     const nextItem = NAV_ITEMS.find((item) => item.id === sectionId);
-    if (!nextItem) {
-      return;
-    }
-
+    if (!nextItem) return;
     setActiveSection(sectionId);
     setScene({
       key: Date.now(),
@@ -161,8 +289,11 @@ function App() {
 
         <div className="topbar-inner">
           <div className="brand-group">
+            {stage === 3 && <AiCompanionLogo />}
             <NavifyLogo />
-            <span className="brand-title">Analytics for Core Lab</span>
+            <span className="brand-title">
+              {stage === 3 ? "AI Companion" : "Analytics for Core Lab"}
+            </span>
           </div>
 
           <div className="actions-group">
@@ -183,13 +314,13 @@ function App() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.18, ease: "easeOut" }}
                   >
-                    {["Stage 1: AI as a Feature", "Stage 2: AI as a Connector", "Stage 3: AI as a Platform"].map((label, i) => (
+                    {STAGES.map((s) => (
                       <button
-                        key={label}
-                        className={`app-launcher-item${i === 0 ? " is-selected" : ""}`}
-                        onClick={() => setLauncherOpen(false)}
+                        key={s.id}
+                        className={`app-launcher-item${s.id === stage ? " is-selected" : ""}`}
+                        onClick={() => handleStageSelect(s.id)}
                       >
-                        {label}
+                        {s.label}
                       </button>
                     ))}
                   </motion.div>
@@ -202,7 +333,9 @@ function App() {
             <button className="icon-button" aria-label="Help">
               <span className="icon-help">?</span>
             </button>
-            <AiCompanionButton onClick={() => setPanelOpen((prev) => !prev)} />
+            {stage !== 3 && (
+              <AiCompanionButton onClick={() => setPanelOpen((prev) => !prev)} />
+            )}
 
             <span className="vertical-divider" aria-hidden="true" />
 
@@ -217,23 +350,27 @@ function App() {
         </div>
       </header>
 
-      <div className="layout-shell">
-        <Sidebar activeSection={activeSection} onSelect={handleSectionSelect} />
-
-        <main className="content-placeholder">
-          <div className="content-scroll-region">
-            <AnimatePresence mode="wait">
-              <ContentSkeleton
-                title={scene.title}
-                layout={scene.layout}
-                sceneKey={scene.key}
-              />
-            </AnimatePresence>
+      {stage === 3 ? (
+        <Stage3Page />
+      ) : (
+        <>
+          <div className="layout-shell">
+            <Sidebar activeSection={activeSection} onSelect={handleSectionSelect} />
+            <main className="content-placeholder">
+              <div className="content-scroll-region">
+                <AnimatePresence mode="wait">
+                  <ContentSkeleton
+                    title={scene.title}
+                    layout={scene.layout}
+                    sceneKey={scene.key}
+                  />
+                </AnimatePresence>
+              </div>
+            </main>
           </div>
-        </main>
-      </div>
-
-      <CompanionPanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />
+          <CompanionPanel isOpen={panelOpen} onClose={() => setPanelOpen(false)} />
+        </>
+      )}
     </div>
   );
 }
