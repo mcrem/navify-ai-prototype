@@ -219,13 +219,14 @@ button {
   z-index: 0;
   inset: 0;
   height: 40px;
-  opacity: 1;
+  opacity: 0;
   filter: blur(6px);
   transition: opacity 420ms ease, filter 520ms ease;
 }
 
 .ai-button-glow-static {
-  opacity: 1;
+  opacity: 0;
+  transition: opacity 420ms ease;
 }
 
 .ai-button-glow-active {
@@ -356,7 +357,14 @@ button {
 .ai-button.is-expanded .ai-button-glow-svg,
 .ai-button:hover .ai-button-glow-svg,
 .ai-button:focus-visible .ai-button-glow-svg {
+  opacity: 1;
   filter: blur(6px);
+}
+
+.ai-button.is-expanded .ai-button-glow-static,
+.ai-button:hover .ai-button-glow-static,
+.ai-button:focus-visible .ai-button-glow-static {
+  opacity: 1;
 }
 
 .ai-button.is-expanded .ai-button-glow-active,
