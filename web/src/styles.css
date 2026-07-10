@@ -175,6 +175,12 @@ button {
   font-weight: 500;
 }
 
+.app-launcher-separator {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 4px 6px;
+}
+
 .actions-group > .icon-button + .icon-button {
   margin-left: 8px;
 }

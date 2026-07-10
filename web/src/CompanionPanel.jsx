@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createScalableSquirclePath } from "./squircle";
+import { useBrandIcon } from "./brand";
 
 const SUGGESTIONS = [
   "What is navify Analytics?",
@@ -75,6 +76,7 @@ function SendIcon() {
 export function ThinkingIndicator() {
   const id = useId().replaceAll(":", "");
   const gradId = `${id}-thinking-grad`;
+  const icon = useBrandIcon();
 
   return (
     <motion.div
@@ -89,7 +91,7 @@ export function ThinkingIndicator() {
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
       >
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+        <svg width="18" height="18" viewBox={icon.viewBox} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
           <defs>
             <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#A855F7" />
@@ -97,8 +99,8 @@ export function ThinkingIndicator() {
               <stop offset="100%" stopColor="#79E22D" />
             </linearGradient>
           </defs>
-          <path d={AI_ICON_PATH_1} fill={`url(#${gradId})`} />
-          <path d={AI_ICON_PATH_2} fill={`url(#${gradId})`} />
+          <path d={icon.paths[0]} fill={`url(#${gradId})`} />
+          <path d={icon.paths[1]} fill={`url(#${gradId})`} />
         </svg>
       </motion.div>
       <span className="companion-thinking-label">Thinking...</span>

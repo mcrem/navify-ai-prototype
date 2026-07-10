@@ -5,7 +5,26 @@ import { Sidebar, NAV_ITEMS } from "./Sidebar";
 import { ContentSkeleton, generateLayout } from "./ContentSkeleton";
 import { CompanionPanel, AI_RESPONSES, THINKING_DELAY_MIN, THINKING_DELAY_MAX, TYPING_SPEED, ThinkingIndicator, TypingMessage, UserBubble } from "./CompanionPanel";
 import { createScalableSquirclePath } from "./squircle";
+import { BrandProvider, useBrand, BRANDS } from "./brand";
 import iphoneAppImg from "/iphone-app.svg";
+
+function BrandSwitcher() {
+  const { brand, setBrand } = useBrand();
+  return (
+    <>
+      <div className="app-launcher-separator" />
+      {Object.entries(BRANDS).map(([key, { label }]) => (
+        <button
+          key={key}
+          className={`app-launcher-item${key === brand ? " is-selected" : ""}`}
+          onClick={() => setBrand(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </>
+  );
+}
 
 const BUTTON_COLLAPSED_WIDTH = 40;
 const BUTTON_EXPANDED_WIDTH = 148;
@@ -496,6 +515,7 @@ function Stage2Page({ stage, onStageSelect, launcherOpen, setLauncherOpen, launc
                   {s.label}
                 </button>
               ))}
+              <BrandSwitcher />
             </motion.div>
           )}
         </AnimatePresence>
@@ -790,6 +810,7 @@ function App() {
   }
 
   return (
+    <BrandProvider>
     <div className="page">
       {stage !== 2 && <header className="topbar" aria-label="navify header">
         <div className="topbar-accent" />
@@ -830,6 +851,7 @@ function App() {
                         {s.label}
                       </button>
                     ))}
+                    <BrandSwitcher />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -887,6 +909,7 @@ function App() {
         </>
       )}
     </div>
+    </BrandProvider>
   );
 }
 
