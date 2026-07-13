@@ -135,7 +135,7 @@ function AiCompanionButton({ onClick }) {
 
       <span className="ai-button-content" aria-hidden="true">
         <span className="ai-button-label-clip">
-          <span className="ai-button-label" ref={labelRef}>navify AI Companion</span>
+          <span className="ai-button-label" ref={labelRef}>AI Companion</span>
         </span>
         <span className="ai-button-icon-anchor">
           <AiCompanionIcon className="ai-button-icon" />
