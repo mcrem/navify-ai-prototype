@@ -27,8 +27,8 @@ function BrandSwitcher() {
 }
 
 const BUTTON_COLLAPSED_WIDTH = 40;
-const BUTTON_EXPANDED_WIDTH = 148;
 const BUTTON_HEIGHT = 40;
+const BUTTON_PADDING = 11 + 8 + 18 + 11; // left + gap + icon + right
 
 const STAGES = [
   { id: 1, label: "Stage 1: AI as a Feature" },
@@ -38,7 +38,15 @@ const STAGES = [
 
 function AiCompanionButton({ onClick }) {
   const [hovered, setHovered] = useState(false);
+  const [expandedWidth, setExpandedWidth] = useState(BUTTON_COLLAPSED_WIDTH);
   const hoverTimer = useRef(null);
+  const labelRef = useRef(null);
+
+  useEffect(() => {
+    if (labelRef.current) {
+      setExpandedWidth(Math.ceil(labelRef.current.scrollWidth) + BUTTON_PADDING);
+    }
+  }, []);
 
   const handleMouseEnter = useCallback(() => {
     hoverTimer.current = setTimeout(() => setHovered(true), 120);
@@ -55,23 +63,23 @@ function AiCompanionButton({ onClick }) {
   const glowGradientId = `${gradientId}-glow`;
   const activeGradientId = `${gradientId}-active`;
   const activeGlowGradientId = `${gradientId}-active-glow`;
-  const width = useMotionValue(hovered ? BUTTON_EXPANDED_WIDTH : BUTTON_COLLAPSED_WIDTH);
+  const width = useMotionValue(hovered ? expandedWidth : BUTTON_COLLAPSED_WIDTH);
   const shapePath = useTransform(width, (value) => createScalableSquirclePath(value, BUTTON_HEIGHT));
   const viewBox = useTransform(width, (value) => `0 0 ${value} ${BUTTON_HEIGHT}`);
 
   useEffect(() => {
-    const controls = animate(width, hovered ? BUTTON_EXPANDED_WIDTH : BUTTON_COLLAPSED_WIDTH, {
+    const controls = animate(width, hovered ? expandedWidth : BUTTON_COLLAPSED_WIDTH, {
       duration: 0.46,
       ease: [0.22, 1, 0.36, 1],
     });
 
     return () => controls.stop();
-  }, [hovered, width]);
+  }, [hovered, width, expandedWidth]);
 
   return (
     <motion.button
       className={`ai-button${hovered ? " is-expanded" : ""}`}
-      aria-label="AI Companion"
+      aria-label="navify AI Companion"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -127,7 +135,7 @@ function AiCompanionButton({ onClick }) {
 
       <span className="ai-button-content" aria-hidden="true">
         <span className="ai-button-label-clip">
-          <span className="ai-button-label">AI Companion</span>
+          <span className="ai-button-label" ref={labelRef}>navify AI Companion</span>
         </span>
         <span className="ai-button-icon-anchor">
           <AiCompanionIcon className="ai-button-icon" />
@@ -177,7 +185,7 @@ function MobileAiButton({ onClick }) {
   const path = createScalableSquirclePath(64, 64);
 
   return (
-    <button className="mobile-ai-button" onClick={onClick} aria-label="AI Companion">
+    <button className="mobile-ai-button" onClick={onClick} aria-label="navify AI Companion">
       <svg className="mobile-ai-button-glow" viewBox="0 0 64 64" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id={`${gradientId}-mg`} x1="10%" y1="8%" x2="90%" y2="92%">
@@ -381,7 +389,7 @@ function MobilePanel({ isOpen, onClose }) {
         >
           <div className="mobile-panel-handle" />
           <div className="mobile-panel-header">
-            <span className="mobile-panel-title">AI Companion</span>
+            <span className="mobile-panel-title">navify AI Companion</span>
             <svg
               className="mobile-panel-close"
               width="16"
@@ -463,7 +471,7 @@ function MobilePanel({ isOpen, onClose }) {
             <input
               className="mobile-panel-input"
               type="text"
-              placeholder="Ask AI Companion"
+              placeholder="Ask navify AI Companion"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
@@ -575,7 +583,7 @@ function Stage3Input({ inputEl, setInputEl, inputPath, inputViewBox, glowGradien
         className="stage3-input"
         type="text"
         placeholder="Ask navify AI Companion"
-        aria-label="Ask AI Companion"
+        aria-label="Ask navify AI Companion"
         value={inputValue}
         onChange={onInputChange}
         onKeyDown={onKeyDown}

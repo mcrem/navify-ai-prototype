@@ -264,7 +264,7 @@ export function CompanionPanel({ isOpen, onClose }) {
           animate={{ x: 0, scale: 1 }}
           exit={{ x: 420, scale: 0.96 }}
           transition={SPRING}
-          aria-label="AI Companion"
+          aria-label="navify AI Companion"
         >
           <svg
             className="companion-panel-glow"
@@ -304,7 +304,7 @@ export function CompanionPanel({ isOpen, onClose }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ ...SPRING, delay: 0.1 }}
               >
-                AI Companion
+                navify AI Companion
               </motion.span>
               <motion.svg
                 className="companion-panel-close"
@@ -423,7 +423,7 @@ export function CompanionPanel({ isOpen, onClose }) {
                   className="companion-panel-input"
                   type="text"
                   placeholder="Ask navify AI Companion"
-                  aria-label="Ask AI Companion"
+                  aria-label="Ask navify AI Companion"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
