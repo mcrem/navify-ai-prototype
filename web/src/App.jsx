@@ -775,7 +775,7 @@ function App() {
   });
 
   useEffect(() => {
-    document.title = "Navify® AI Companion";
+    document.title = "navify® AI Companion";
   }, [stage]);
 
   useEffect(() => {
@@ -820,7 +820,7 @@ function App() {
             {stage === 3 && <AiCompanionLogo />}
             <NavifyLogo />
             <span className="brand-title">
-              {stage === 3 ? "AI Companion" : "Analytics for Core Lab"}
+              {stage === 3 ? "AI Companion" : "Analytics"}
             </span>
           </div>
 
